@@ -7,14 +7,14 @@
   <link rel="icon" type="image/x-icon" href="static/assets/favicon.ico">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <style>
-    :root{--bg:#07111f;--panel:#0f1a2a;--line:rgba(148,184,218,.16);--muted:#7a8ea1;--text:#e0e6ed;--accent:#4dd7d0;--toolbar:54px;--path-color:#4dd7d0}
+    :root{--bg:#07111f;--panel:#0f1a2a;--line:rgba(148,184,218,.16);--muted:#7a8ea1;--text:#e0e6ed;--accent:#4ade80;--toolbar:54px;--path-color:#4ade80}
     *{box-sizing:border-box;margin:0;padding:0}
     html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif}
     button{font:inherit;color:inherit;border:none;background:none;cursor:pointer}
     a{color:inherit;text-decoration:none}
     .topbar{height:var(--toolbar);display:flex;align-items:center;padding:0 16px;border-bottom:1px solid var(--line);background:rgba(7,17,31,.97);gap:14px;position:relative;z-index:1000}
     .brand{display:flex;align-items:center;gap:10px;min-width:160px}
-    .brand-mark{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:linear-gradient(135deg,#4dd7d0,#65a9ff);font-size:16px}
+    .brand-mark{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:linear-gradient(135deg,#4ade80,#65a9ff);font-size:16px}
     .brand strong{font-size:17px;font-weight:700}
     .brand small{color:var(--muted);font-size:9px;letter-spacing:.12em;text-transform:uppercase;margin-left:6px}
     .page-tabs{display:flex;padding:3px;gap:3px;border:1px solid var(--line);border-radius:10px;background:#0d1a2e}
@@ -129,8 +129,8 @@
     'use strict';
     const $ = s => document.querySelector(s);
     const STORAGE_KEY = 'footprintPaths';
-    const PATH_COLOR = '#4dd7d0';
-    const PALETTE = ['#4dd7d0','#ff6b7a','#ffc66d','#65a9ff','#6dd4a0','#8ba3ff','#ff8c5a','#c792ea'];
+    const PATH_COLOR = '#4ade80';
+    const PALETTE = ['#4ade80','#ff6b7a','#ffc66d','#65a9ff','#6dd4a0','#8ba3ff','#ff8c5a','#c792ea'];
 
     const state = { map:null, drawing:false, waypoints:[], previewLine:null, waypointMarkers:[], paths:[], pathLayers:{}, drawerOpen:false };
 

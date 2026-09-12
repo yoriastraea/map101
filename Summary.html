@@ -6,7 +6,7 @@
   <title>综合总览</title>
   <link rel="icon" type="image/x-icon" href="static/assets/favicon.ico">
   <style>
-    :root{--bg:#07111f;--panel:#0f1a2a;--line:rgba(148,184,218,.12);--muted:#6a7e92;--text:#e0e6ed;--accent:#4dd7d0;--toolbar:54px;--air:#ff6b7a;--rail:#4dd7d0;--city:#5b78f5;--trail:#ffc66d;--card-r:16px}
+    :root{--bg:#07111f;--panel:#0f1a2a;--line:rgba(148,184,218,.12);--muted:#6a7e92;--text:#e0e6ed;--accent:#4ade80;--toolbar:54px;--air:#ff6b7a;--rail:#4ade80;--city:#5b78f5;--trail:#ffc66d;--card-r:16px}
     *{box-sizing:border-box;margin:0;padding:0}
     html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif}
     button{font:inherit;color:inherit;border:none;background:none;cursor:pointer}
@@ -15,7 +15,7 @@
     /* topbar */
     .topbar{height:var(--toolbar);display:flex;align-items:center;padding:0 16px;border-bottom:1px solid var(--line);background:rgba(7,17,31,.97);gap:14px;position:sticky;top:0;z-index:100}
     .brand{display:flex;align-items:center;gap:10px;min-width:160px}
-    .brand-mark{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:linear-gradient(135deg,#4dd7d0,#65a9ff);font-size:16px}
+    .brand-mark{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:linear-gradient(135deg,#4ade80,#65a9ff);font-size:16px}
     .brand strong{font-size:17px;font-weight:700}
     .brand small{color:var(--muted);font-size:9px;letter-spacing:.12em;text-transform:uppercase;margin-left:6px}
     .page-tabs{display:flex;padding:3px;gap:3px;border:1px solid var(--line);border-radius:10px;background:#0d1a2e}
@@ -160,7 +160,7 @@
     'use strict';
     const $ = s => document.querySelector(s);
     const levelNames = ['未到访','途经','停留','游览','住宿','居住'];
-    const levelColors = ['#4a5568','#65a9ff','#4dd7d0','#6dd4a0','#ffc66d','#ff6b7a'];
+    const levelColors = ['#4a5568','#65a9ff','#4ade80','#6dd4a0','#ffc66d','#ff6b7a'];
 
     function load(key, fallback) {
       try { const d = localStorage.getItem(key); return d ? JSON.parse(d) : fallback; }

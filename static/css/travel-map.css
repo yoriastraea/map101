@@ -944,7 +944,7 @@ body {
     --atlas-border: rgba(148, 184, 218, 0.16);
     --atlas-muted: #91a6bb;
     --atlas-text: #edf7ff;
-    --atlas-cyan: #4dd7d0;
+    --atlas-cyan: #4ade80;
     --atlas-blue: #65a9ff;
     --atlas-coral: #ff7b72;
     --atlas-shadow: 0 18px 48px rgba(0, 7, 18, 0.36);
@@ -1197,7 +1197,7 @@ a:focus-visible {
 
 .stats-scope-switch button.active {
     color: #06131e;
-    background: #4dd7d0;
+    background: #4ade80;
     box-shadow: 0 0 14px rgba(77, 215, 208, 0.2);
 }
 
@@ -1413,7 +1413,7 @@ a:focus-visible {
 }
 
 .rail-fraction strong {
-    color: #4dd7d0;
+    color: #4ade80;
     font-weight: 700;
 }
 
@@ -1486,7 +1486,7 @@ a:focus-visible {
 }
 
 .rail-coverage-row b {
-    color: #4dd7d0;
+    color: #4ade80;
 }
 
 .rail-coverage-track {
@@ -1687,7 +1687,7 @@ body {
 .form-control:focus,
 .form-select:focus {
     background-color: #121f33 !important;
-    border-color: #4dd7d0 !important;
+    border-color: #4ade80 !important;
     color: #e0e6ed !important;
     box-shadow: 0 0 0 0.25rem rgba(77, 215, 208, 0.15) !important;
 }
@@ -1734,8 +1734,8 @@ body {
 
 .btn-outline-dark:hover {
     background-color: rgba(77, 215, 208, 0.1) !important;
-    border-color: #4dd7d0 !important;
-    color: #4dd7d0 !important;
+    border-color: #4ade80 !important;
+    color: #4ade80 !important;
 }
 
 /* 链接 */
@@ -1803,7 +1803,7 @@ hr {
 
 /* 代码块 */
 code {
-    color: #4dd7d0 !important;
+    color: #4ade80 !important;
 }
 
 /* 列表组 */
@@ -1828,8 +1828,8 @@ code {
 
 .nav-link.active {
     background-color: #0f1a2a !important;
-    border-color: #4dd7d0 !important;
-    color: #4dd7d0 !important;
+    border-color: #4ade80 !important;
+    color: #4ade80 !important;
 }
 
 /* 进度条 */
