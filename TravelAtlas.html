@@ -315,10 +315,10 @@
 
     function renderTable(){
       $('#dataBody').innerHTML=state.rows.map((r,i)=>`<tr data-id="${r.id}"><td class="row-num">${i+1}</td><td><select data-key="mode"><option value="air" ${r.mode==='air'?'selected':''}>航空</option><option value="train" ${r.mode==='train'?'selected':''}>铁路</option></select></td>${cell('date',r.date,'110px')}${cell('origin',r.origin,'105px')}${cell('destination',r.destination,'105px')}${cell('service',r.service,'92px')}${cell('duration',r.duration??'','76px','number')}${cell('distance',r.distance??'','76px','number')}<td><button class="delete-row" title="删除"><i class="bi bi-x-lg"></i></button></td></tr>`).join('');
-      $$('#dataBody input,#dataBody select').forEach(el=>el.addEventListener('change',editRow));$$('.delete-row').forEach(el=>el.addEventListener('click',e=>{const id=e.currentTarget.closest('tr').dataset.id;state.rows=state.rows.filter(r=>r.id!==id);renderAll()}));
+      $$('#dataBody input,#dataBody select').forEach(el=>el.addEventListener('change',editRow));$$('.delete-row').forEach(el=>el.addEventListener('click',e=>{const id=e.currentTarget.closest('tr').dataset.id;state.rows=state.rows.filter(r=>r.id!==id);saveToStorage();renderAll()}));
     }
     function cell(key,value,width,type='text'){return `<td><input data-key="${key}" type="${type}" value="${esc(value)}" style="min-width:${width}"></td>`}
-    function editRow(e){const tr=e.target.closest('tr'),row=state.rows.find(r=>r.id===tr.dataset.id),key=e.target.dataset.key;row[key]=['duration','distance'].includes(key)?num(e.target.value):clean(e.target.value);if(key==='origin')row.originLabel=row.origin;if(key==='destination')row.destinationLabel=row.destination;scheduleRender()}
+    function editRow(e){const tr=e.target.closest('tr'),row=state.rows.find(r=>r.id===tr.dataset.id),key=e.target.dataset.key;row[key]=['duration','distance'].includes(key)?num(e.target.value):clean(e.target.value);if(key==='origin')row.originLabel=row.origin;if(key==='destination')row.destinationLabel=row.destination;saveToStorage();scheduleRender()}
     function scheduleRender(){clearTimeout(state.timer);state.timer=setTimeout(()=>{updateMap();renderStats()},180)}
 
     function scopedRows(){return state.scope==='combined'?state.rows:state.rows.filter(r=>r.mode===state.scope)}
@@ -371,7 +371,7 @@
         foreign.forEach(([k,v])=>state.foreign.set(k,v));
         uploadedAirports.forEach(([k,v])=>state.airport.set(k,v));
         if(!all.length)throw Error('未识别到行程列');
-        state.rows=all;renderAll(true);
+        state.rows=all;saveToStorage();renderAll(true);
         const matched=buildFeatures().routes.features.length;
         toast(`导入 ${all.length} 条，成功绘制 ${matched} 条`);
       }catch(e){setStatus('导入失败：'+e.message,true);toast('导入失败，请检查表头')}
@@ -379,7 +379,10 @@
     function download(name,text,type='text/csv;charset=utf-8'){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+text],{type}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500)}
     function exportCSV(template=false){const head=['类型','日期','出发','到达','航班/车次','时长(分钟)','里程(km)','出发经度','出发纬度','到达经度','到达纬度'],rows=template?[['航空','2026-01-01','LHR','JFK','BA0175','','','','','',''],['航空','2026-01-02','广州白云','上海虹桥','CZ3539','','','','','',''],['铁路','2026-01-03','上海虹桥','杭州东','G7333','','','','','','']]:state.rows.map(r=>[r.mode==='air'?'航空':'铁路',r.date,r.origin,r.destination,r.service,r.duration??'',r.distance??'',r.originLon??'',r.originLat??'',r.destinationLon??'',r.destinationLat??'']);download(template?'TravelAtlas_导入模板.csv':'TravelAtlas_行程数据.csv',[head,...rows].map(row=>row.map(v=>'"'+clean(v).replace(/"/g,'""')+'"').join(',')).join('\r\n'))}
 
-    const fileInput=$('#fileInput');$('#uploadBtn').onclick=()=>fileInput.click();$('#dropZone').onclick=e=>{if(e.target!==fileInput)fileInput.click()};fileInput.onchange=e=>{const files=[...e.target.files];e.target.value='';importFiles(files)};$('#addBtn').onclick=()=>{$('#manualAddModal').classList.add('show');$('#maOrigin').focus()};$('#clearBtn').onclick=()=>{state.userLoaded=true;state.rows=[];renderAll();toast('表格已清空')};$('#fitBtn').onclick=()=>updateMap(true);$('#exportBtn').onclick=()=>exportCSV(false);$('#templateBtn').onclick=()=>exportCSV(true);$('#loadCurrentBtn').onclick=()=>{state.userLoaded=false;loadCurrent()};
+    function saveToStorage(){try{localStorage.setItem('travelAtlasRows',JSON.stringify(state.rows))}catch(e){}}
+    function loadFromStorage(){try{const d=localStorage.getItem('travelAtlasRows');if(d){state.rows=JSON.parse(d);return true}}catch(e){}return false}
+
+    const fileInput=$('#fileInput');$('#uploadBtn').onclick=()=>fileInput.click();$('#dropZone').onclick=e=>{if(e.target!==fileInput)fileInput.click()};fileInput.onchange=e=>{const files=[...e.target.files];e.target.value='';importFiles(files)};$('#addBtn').onclick=()=>{$('#manualAddModal').classList.add('show');$('#maOrigin').focus()};$('#clearBtn').onclick=()=>{state.userLoaded=true;state.rows=[];saveToStorage();renderAll();toast('表格已清空')};$('#fitBtn').onclick=()=>updateMap(true);$('#exportBtn').onclick=()=>exportCSV(false);$('#templateBtn').onclick=()=>exportCSV(true);$('#loadCurrentBtn').onclick=()=>{state.userLoaded=false;loadCurrent()};
     const zone=$('#dropZone');['dragenter','dragover'].forEach(n=>zone.addEventListener(n,e=>{e.preventDefault();zone.classList.add('dragging')}));['dragleave','drop'].forEach(n=>zone.addEventListener(n,e=>{e.preventDefault();zone.classList.remove('dragging')}));zone.addEventListener('drop',e=>importFiles([...e.dataTransfer.files]));
     $$('.stats-tabs button').forEach(btn=>btn.onclick=()=>{$$('.stats-tabs button').forEach(b=>b.classList.toggle('active',b===btn));state.scope=btn.dataset.scope;renderStats()});
     $$('.mode-switch button').forEach(btn=>btn.onclick=()=>{const mode=btn.dataset.mode;if(mode==='all'){const on=!(state.visible.air&&state.visible.train);state.visible.air=on;state.visible.train=on;$$('.mode-switch button').forEach(b=>b.classList.toggle('active',on))}else{state.visible[mode]=!state.visible[mode];btn.classList.toggle('active',state.visible[mode]);const all=$('.mode-switch [data-mode=all]');all.classList.toggle('active',state.visible.air&&state.visible.train)}updateMap()});
@@ -498,6 +501,7 @@
         destinationLat:qaSelectedDest.lat
       };
       state.rows.push(row);
+      saveToStorage();
       renderAll(true);
       closeQuickAdd();
       toast('已添加行程');
@@ -516,12 +520,13 @@
       state.userLoaded=true;
       const row=normalizedRow({'类型':type==='air'?'航空':'铁路','日期':$('#maDate').value,'出发':origin,'到达':dest,'航班/车次':$('#maService').value,'时长':$('#maDuration').value||''});
       state.rows.push(row);
+      saveToStorage();
       renderAll(true);
       closeManualAdd();
       toast('已添加行程');
     };
 
-    initMap();state.referencePromise=Promise.all([loadReferences(),getCurrentData().catch(()=>null)]);state.referencePromise.then(()=>{if(!state.userLoaded)loadCurrent()});
+    initMap();state.referencePromise=Promise.all([loadReferences(),getCurrentData().catch(()=>null)]);state.referencePromise.then(()=>{if(loadFromStorage()){state.userLoaded=true;renderAll(true);setStatus(`已恢复 ${state.rows.length} 条本地保存的行程`)}else if(!state.userLoaded)loadCurrent()});
   })();
   </script>
 </body>
