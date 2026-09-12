@@ -1661,3 +1661,205 @@ a:focus-visible {
         transition-duration: 0.01ms !important;
     }
 }
+
+/* ========== 全局暗色主题覆盖 ========== */
+:root {
+    --bs-body-color: #e0e6ed;
+    --bs-body-bg: #07111f;
+    --bs-border-color: rgba(148, 184, 218, 0.16);
+    --bs-link-color: #65a9ff;
+    --bs-link-hover-color: #8ba3ff;
+}
+
+body {
+    background: #07111f !important;
+    color: #e0e6ed !important;
+}
+
+/* Bootstrap 表单元素暗色化 */
+.form-control,
+.form-select {
+    background-color: #0f1a2a !important;
+    border-color: rgba(148, 184, 218, 0.2) !important;
+    color: #e0e6ed !important;
+}
+
+.form-control:focus,
+.form-select:focus {
+    background-color: #121f33 !important;
+    border-color: #4dd7d0 !important;
+    color: #e0e6ed !important;
+    box-shadow: 0 0 0 0.25rem rgba(77, 215, 208, 0.15) !important;
+}
+
+.form-control::placeholder {
+    color: #6b7f94 !important;
+}
+
+.form-control:disabled {
+    background-color: #0a1525 !important;
+}
+
+/* 表格暗色 */
+.table {
+    --bs-table-color: #d0dae6;
+    --bs-table-bg: transparent;
+    --bs-table-border-color: rgba(148, 184, 218, 0.12);
+    --bs-table-striped-bg: rgba(255, 255, 255, 0.02);
+    --bs-table-striped-color: #d0dae6;
+    --bs-table-hover-bg: rgba(77, 215, 208, 0.04);
+    --bs-table-hover-color: #e0e6ed;
+}
+
+.table th {
+    color: #91a6bb !important;
+}
+
+.table td {
+    color: #d0dae6 !important;
+}
+
+/* 卡片和面板 */
+.card {
+    background-color: #0f1a2a !important;
+    border-color: rgba(148, 184, 218, 0.16) !important;
+    color: #e0e6ed !important;
+}
+
+/* 按钮暗色 */
+.btn-outline-dark {
+    color: #91a6bb !important;
+    border-color: rgba(148, 184, 218, 0.25) !important;
+}
+
+.btn-outline-dark:hover {
+    background-color: rgba(77, 215, 208, 0.1) !important;
+    border-color: #4dd7d0 !important;
+    color: #4dd7d0 !important;
+}
+
+/* 链接 */
+a {
+    color: #65a9ff;
+}
+
+a:hover {
+    color: #8ba3ff;
+}
+
+/* Bootstrap badge / alert 等 */
+.bg-light {
+    background-color: #121f33 !important;
+}
+
+.text-dark {
+    color: #e0e6ed !important;
+}
+
+.text-muted {
+    color: #7a8ea1 !important;
+}
+
+.text-body {
+    color: #e0e6ed !important;
+}
+
+/* 下拉菜单 */
+.dropdown-menu {
+    background-color: #0f1a2a !important;
+    border-color: rgba(148, 184, 218, 0.2) !important;
+}
+
+.dropdown-item {
+    color: #d0dae6 !important;
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+    background-color: rgba(77, 215, 208, 0.1) !important;
+    color: #e0e6ed !important;
+}
+
+/* 模态框 */
+.modal-content {
+    background-color: #0f1a2a !important;
+    border-color: rgba(148, 184, 218, 0.2) !important;
+    color: #e0e6ed !important;
+}
+
+.modal-header {
+    border-bottom-color: rgba(148, 184, 218, 0.16) !important;
+}
+
+.modal-footer {
+    border-top-color: rgba(148, 184, 218, 0.16) !important;
+}
+
+/* 分隔线 */
+hr {
+    border-color: rgba(148, 184, 218, 0.12) !important;
+    opacity: 1 !important;
+}
+
+/* 代码块 */
+code {
+    color: #4dd7d0 !important;
+}
+
+/* 列表组 */
+.list-group-item {
+    background-color: #0f1a2a !important;
+    border-color: rgba(148, 184, 218, 0.12) !important;
+    color: #d0dae6 !important;
+}
+
+/* 导航标签暗色 */
+.nav-tabs {
+    border-bottom-color: rgba(148, 184, 218, 0.16) !important;
+}
+
+.nav-link {
+    color: #91a6bb !important;
+}
+
+.nav-link:hover {
+    color: #e0e6ed !important;
+}
+
+.nav-link.active {
+    background-color: #0f1a2a !important;
+    border-color: #4dd7d0 !important;
+    color: #4dd7d0 !important;
+}
+
+/* 进度条 */
+.progress {
+    background-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+/* Toast / Alert */
+.alert {
+    background-color: #121f33 !important;
+    border-color: rgba(148, 184, 218, 0.2) !important;
+    color: #d0dae6 !important;
+}
+
+/* 确保所有白色背景被覆盖 */
+[style*="background-color: white"],
+[style*="background-color: #fff"],
+[style*="background-color: #ffffff"] {
+    background-color: #0f1a2a !important;
+}
+
+/* 滚动条全局暗色 */
+*::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.03) !important;
+}
+
+*::-webkit-scrollbar-thumb {
+    background: rgba(148, 184, 218, 0.2) !important;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+    background: rgba(148, 184, 218, 0.35) !important;
+}
