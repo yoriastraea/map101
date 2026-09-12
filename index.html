@@ -1,441 +1,87 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <meta name="description" content="个人航空、铁路、公路与城市探索可视化档案" />
-    <meta name="author" content="Tianci Wang" />
-    <title>Travel Atlas · Tianci Wang</title>
-
-    <!-- Fonts & Icons -->
-    <link rel="icon" type="image/x-icon" href="static/assets/favicon.ico" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" />
-    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,600;1,600&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,300;0,500;0,600;0,700;1,300;1,500;1,600;1,700&display=swap" rel="stylesheet" />
-
-    <!-- Core CSS -->
-    <link type="text/css" href="static/css/styles.css" rel="stylesheet" />
-    <link rel="stylesheet" href="static/css/travel-map.css?v=rail-area-1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Travel Atlas</title>
+    <link rel="icon" type="image/x-icon" href="static/assets/favicon.ico">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{min-height:100vh;background:#07111f;color:#e0e6ed;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+        .logo{width:64px;height:64px;border-radius:18px;display:grid;place-items:center;background:linear-gradient(135deg,#4dd7d0,#65a9ff);font-size:28px;margin-bottom:20px;box-shadow:0 8px 24px rgba(77,215,208,.25)}
+        h1{font-size:22px;font-weight:700;letter-spacing:.02em;margin-bottom:6px}
+        .sub{font-size:13px;color:#7a8ea1;margin-bottom:36px}
+        .links{width:100%;max-width:380px;display:flex;flex-direction:column;gap:12px}
+        .link-card{display:flex;align-items:center;gap:14px;padding:16px 18px;background:#0f1a2a;border:1px solid rgba(148,184,218,.16);border-radius:14px;text-decoration:none;color:#e0e6ed;transition:.2s}
+        .link-card:hover{background:#121f33;border-color:rgba(77,215,208,.35);transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,0,0,.25)}
+        .link-icon{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;font-size:20px;flex-shrink:0}
+        .link-icon.air{background:rgba(255,107,122,.15);color:#ff6b7a}
+        .link-icon.city{background:rgba(91,120,245,.15);color:#5b78f5}
+        .link-icon.rail{background:rgba(77,215,208,.15);color:#4dd7d0}
+        .link-icon.road{background:rgba(255,198,109,.15);color:#ffc66d}
+        .link-icon.full{background:rgba(139,163,255,.12);color:#8ba3ff}
+        .link-text strong{display:block;font-size:14px;margin-bottom:2px}
+        .link-text span{font-size:11px;color:#7a8ea1}
+        .link-arrow{margin-left:auto;color:#4a5a6e;font-size:18px}
+        .footer{margin-top:40px;font-size:11px;color:#4a5a6e;text-align:center;line-height:1.6}
+        .footer a{color:#65a9ff;text-decoration:none}
+    </style>
 </head>
 <body>
-    <div id="dragMask" aria-hidden="true"></div>
-    <!-- Navigation -->
-    <nav class="navbar fixed-top" id="mainNav" aria-label="站点导航">
-        <div class="container-fluid px-3 px-md-4">
-            <a class="navbar-brand" href="./" aria-label="返回旅行地图首页">
-                <span class="brand-mark" aria-hidden="true"><i class="bi bi-compass"></i></span>
-                <span class="brand-copy"><strong>Travel Atlas</strong><small>Tianci Wang</small></span>
-            </a>
-            <div class="nav-meta" aria-label="档案说明">
-                <a class="quick-entry" href="TravelAtlas.html" aria-label="打开 TravelAtlas 快速上手版"><i class="bi bi-lightning-charge-fill"></i> 快速版</a>
-                <a class="github-entry" href="https://github.com/Ethenone/Travel-map" target="_blank" rel="noopener noreferrer" aria-label="在 GitHub 打开 Travel-map 原项目"><i class="bi bi-github"></i><span class="github-entry-label">GitHub</span></a>
-                <span class="nav-description">Personal mobility archive</span>
-                <span class="archive-badge"><i class="bi bi-circle-fill"></i> Interactive</span>
+    <div class="logo">🧭</div>
+    <h1>Travel Atlas</h1>
+    <p class="sub">个人交通与城市探索可视化</p>
+
+    <div class="links">
+        <a class="link-card" href="TravelAtlas.html">
+            <div class="link-icon air">✈️</div>
+            <div class="link-text">
+                <strong>快速添加行程</strong>
+                <span>选择航线/铁路，实时绘制连线地图</span>
             </div>
-        </div>
-    </nav>
+            <div class="link-arrow">›</div>
+        </a>
 
-    <!-- 主应用容器 -->
-    <div class="app-container" id="app">
-        <!-- 左侧边栏 - 地图选择 -->
-        <aside class="sidebar-left" id="sidebarLeft" aria-label="地图选择">
-            <div class="sidebar-header">
-                <h3>📍 地图选择</h3>
-                <button class="collapse-btn" id="collapseLeftBtn" type="button" title="折叠侧边栏" aria-label="折叠地图选择栏" aria-expanded="true">
-                    <i class="bi bi-chevron-left"></i>
-                </button>
+        <a class="link-card" href="TravelAtlasCity.html">
+            <div class="link-icon city">🏙️</div>
+            <div class="link-text">
+                <strong>中国城市探索</strong>
+                <span>标记到访城市，查看探索等级</span>
             </div>
+            <div class="link-arrow">›</div>
+        </a>
 
-            <div class="map-category">航空 / 铁路</div>
-            <ul class="map-list">
-                <li class="map-item active" data-map="map1">
-                    <span class="map-icon">✈️</span>
-                    <span>球面地图 (飞机/火车)</span>
-                </li>
-                <li class="map-item" data-map="map2">
-                    <span class="map-icon">🚆</span>
-                    <span>路线地图 (火车)</span>
-                </li>
-            </ul>
-
-            <div class="map-category">公路</div>
-            <ul class="map-list">
-                <li class="map-item" data-map="map3">
-                    <span class="map-icon">🚴</span>
-                    <span>公路轨迹地图</span>
-                </li>
-                <li class="map-item" data-map="map4">
-                    <span class="map-icon">🔥</span>
-                    <span>热力图 (骑行)</span>
-                </li>
-            </ul>
-
-            <div class="map-category">探索</div>
-            <ul class="map-list">
-                <li class="map-item" data-map="map5">
-                    <span class="map-icon">🇨🇳</span>
-                    <span>中国城市探索等级</span>
-                </li>
-                <li class="map-item" data-map="map6">
-                    <span class="map-icon">🏙️</span>
-                    <span>上海探索</span>
-                </li>
-            </ul>
-        </aside>
-
-        <!-- 中间地图区域 -->
-        <main class="map-area" id="mapArea">
-            <div class="map-context" aria-live="polite">
-                <span class="map-context-kicker">CURRENT VIEW</span>
-                <strong id="currentMapTitle">球面交通地图</strong>
-                <span id="currentMapDescription">沿大圆最短路径浏览航空与铁路连接</span>
+        <a class="link-card" href="map/map_line.html">
+            <div class="link-icon full">🌍</div>
+            <div class="link-text">
+                <strong>球面交通地图</strong>
+                <span>航空与铁路大圆航线总览</span>
             </div>
-            <!-- 地图1: 直线地图 -->
-            <div class="map-container active" id="map1-container">
-                <iframe src="map/map_line.html?v=globe-2" title="球面航空与铁路地图"></iframe>
+            <div class="link-arrow">›</div>
+        </a>
+
+        <a class="link-card" href="map/map_rail.html">
+            <div class="link-icon rail">🚆</div>
+            <div class="link-text">
+                <strong>真实铁路轨迹</strong>
+                <span>基于 OSM 的火车实际行驶路线</span>
             </div>
+            <div class="link-arrow">›</div>
+        </a>
 
-            <!-- 地图2: 火车路线 (全屏 + 浮动图表) -->
-            <div class="map-container" id="map2-container">
-                <iframe id="map2Iframe" data-src="map/map_rail.html?v=real-track-1" title="真实铁路轨迹地图"></iframe>
-
-                <!-- 地图2工具栏 -->
-                <div class="map-toolbar" aria-label="铁路图表工具栏">
-                    <button class="map-toolbar-btn" id="toggleScatterPanelBtn" title="显示散点图">
-                        <i class="bi bi-grid-3x3-gap"></i>
-                    </button>
-                    <button class="map-toolbar-btn" id="toggleHistPanelBtn" title="显示直方图">
-                        <i class="bi bi-bar-chart"></i>
-                    </button>
-                    <button class="map-toolbar-btn" id="toggleTimeDistPanelBtn" title="时间分布">
-                        <i class="bi bi-clock-history"></i>
-                    </button>
-                    <button class="map-toolbar-btn" id="toggleConnectionPanelBtn" title="城市关联图">
-                        🔗
-                    </button>
-                </div>
-
-                <!-- 浮动散点图面板 -->
-                <div class="floating-chart-panel" id="floatingScatterPanel">
-                    <div class="floating-panel-header" id="scatterPanelHeader">
-                        <h4><i class="bi bi-scatter-chart"></i> 散点图分析</h4>
-                        <div class="floating-panel-controls">
-                            <button class="minimize-panel" data-panel="scatter" title="最小化">
-                                <i class="bi bi-dash"></i>
-                            </button>
-                            <button class="close-panel" data-panel="scatter" title="关闭">
-                                <i class="bi bi-x"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="floating-panel-body">
-                        <div class="scatter-type-switch">
-                            <button class="active" data-scatter-type="time">⏰ Departure-Arrival</button>
-                            <button data-scatter-type="distance">📏 Distance-Duration</button>
-                            <button data-scatter-type="station">📍 Distribution of Stations</button>
-                        </div>
-                        <canvas id="floatingScatterChart"></canvas>
-                    </div>
-                </div>
-
-                <!-- 浮动直方图面板 -->
-                <div class="floating-chart-panel" id="floatingHistPanel">
-                    <div class="floating-panel-header" id="histPanelHeader">
-                        <h4><i class="bi bi-bar-chart"></i> 直方图分析</h4>
-                        <div class="floating-panel-controls">
-                            <button class="minimize-panel" data-panel="hist" title="最小化">
-                                <i class="bi bi-dash"></i>
-                            </button>
-                            <button class="close-panel" data-panel="hist" title="关闭">
-                                <i class="bi bi-x"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="floating-panel-body">
-                        <div class="floating-chart-switch">
-                            <button class="active" data-hist-type="duration">⏱️ 时长分布</button>
-                            <button data-hist-type="distance">📏 距离分布</button>
-                        </div>
-                        <canvas id="floatingHistChart"></canvas>
-                    </div>
-                </div>
-
-                <!-- 浮动时间分布面板 -->
-                <div class="floating-chart-panel" id="floatingTimeDistPanel">
-                    <div class="floating-panel-header" id="timeDistPanelHeader">
-                        <h4><i class="bi bi-clock-history"></i> 出发/到达时间分布</h4>
-                        <div class="floating-panel-controls">
-                            <button class="minimize-panel" data-panel="timeDist" title="最小化">
-                                <i class="bi bi-dash"></i>
-                            </button>
-                            <button class="close-panel" data-panel="timeDist" title="关闭">
-                                <i class="bi bi-x"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="floating-panel-body">
-                        <canvas id="floatingTimeDistChart"></canvas>
-                    </div>
-                </div>
+        <a class="link-card" href="map/map_with_polyline_cityselect.html">
+            <div class="link-icon road">🚴</div>
+            <div class="link-text">
+                <strong>公路轨迹地图</strong>
+                <span>骑行与自驾路线记录</span>
             </div>
+            <div class="link-arrow">›</div>
+        </a>
+    </div>
 
-            <!-- 浮动关联图面板 -->
-            <div class="floating-chart-panel" id="floatingConnectionPanel">
-                <div class="floating-panel-header" id="connectionPanelHeader">
-                    <h4>🔗 城市关联图</h4>
-                    <div class="floating-panel-controls">
-                        <button class="minimize-panel" data-panel="connection" title="最小化">−</button>
-                        <button class="close-panel" data-panel="connection" title="关闭">×</button>
-                    </div>
-                </div>
-                <div class="floating-panel-body">
-                    <!-- 图表类型切换 -->
-                    <div class="floating-chart-switch">
-                        <button class="active" data-connection-type="chord-directed">🔄 有向和弦图</button>
-                        <button data-connection-type="chord-undirected">🔗 无向和弦图</button>
-                        <button data-connection-type="network">🕸️ 网络图</button>
-                    </div>
-
-                    <!-- 城市数量选择 -->
-                    <div style="margin-bottom: 12px; display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: rgba(255,255,255,0.7);">
-                        <span>城市数量：</span>
-                        <input id="cityCountSlider" type="range" min="5" max="20" value="10" step="1" style="flex:1;">
-                        <span id="cityCountValue">10</span>
-                    </div>
-
-                    <!-- ECharts 容器 -->
-                    <div id="connectionChart" style="width: 100%; height: 420px;"></div>
-
-                    <!-- 信息栏 -->
-                    <div id="connectionInfo" style="margin-top: 12px; font-size: 0.75rem; color: rgba(255,255,255,0.5);"></div>
-                </div>
-            </div>
-
-
-            <!-- 地图3: 公路地图 -->
-            <div class="map-container" id="map3-container">
-                <iframe data-src="map/map_with_polyline_cityselect.html?v=maplibre-road-1" title="公路轨迹地图"></iframe>
-            </div>
-
-            <!-- 地图4: 骑行热力图 -->
-            <div class="map-container" id="map4-container">
-                <iframe data-src="map/straight-line.html" title="骑行热力地图"></iframe>
-            </div>
-
-            <!-- 地图5: 城市探索 -->
-            <div class="map-container" id="map5-container">
-                <iframe data-src="map/map_city.html" title="中国城市探索等级地图"></iframe>
-            </div>
-
-            <!-- 地图6: 上海探索 -->
-            <div class="map-container" id="map6-container">
-                <iframe data-src="map/map_shanghai.html?v=light-gray-1" title="上海探索地图"></iframe>
-            </div>
-        </main>
-
-        <!-- 右侧折叠按钮 -->
-        <button class="toggle-right-btn" id="toggleRightBtn" type="button" title="折叠统计面板" aria-label="折叠统计面板" aria-expanded="true">
-            <i class="bi bi-chevron-right"></i>
-        </button>
-
-        <!-- 右侧统计面板 -->
-        <aside class="sidebar-right" id="sidebarRight" aria-label="统计分析">
-            <div class="stats-header">
-                <h3>📊 统计分析</h3>
-                <div class="stats-scope-switch" id="travelScopeSwitch" aria-label="球面地图统计范围">
-                    <button class="active" type="button" data-travel-scope="combined" aria-pressed="true">航空 + 火车</button>
-                    <button type="button" data-travel-scope="air" aria-pressed="false">仅航空</button>
-                </div>
-            </div>
-
-            <div class="stats-tabs" aria-hidden="true">
-                <button class="stats-tab active" data-stats="travel" tabindex="-1">✈️ 旅行统计</button>
-                <button class="stats-tab" data-stats="train" tabindex="-1">🚆 火车统计</button>
-            </div>
-
-            <div class="stats-content">
-                <!-- ========== 旅行统计面板 ========== -->
-                <div class="stats-panel active" id="stats-travel">
-                    <!-- 概览卡片 -->
-                    <div class="stats-grid" id="travelStatsGrid"></div>
-
-                    <hr class="section-divider">
-
-                    <!-- 统计面板 -->
-                    <div class="chart-container">
-                        <!-- 书页式标签栏：完全类似浏览器顶端的书签样式 -->
-                        <div class="tabs-header" style="display: flex; gap: 0.25rem; height: 40px">
-                            <button class="tab-btn active" id="tabAirlinesBtn"> Flown Airlines </button>
-                            <button class="tab-btn" id="tabCitiesBtn"> Visited Cities </button>
-                            <button class="tab-btn" id="tabAirportsBtn"> Visited Airports </button>
-                            <button class="tab-btn" id="tabAircraftsBtn"> Flown Aircrafts </button>
-                            <button class="tab-btn" id="tabAllAircraftsBtn"> All Aircrafts </button>
-                        </div>
-                        <div id="AirlinesTable" style="font-size: 0.8rem;width:100%; display: block">
-                        </div>
-                        <div id="CitiesTable" style="font-size: 0.8rem; width: 100%; display: none ">
-                        </div>
-                        <div id="AirportsTable" style="font-size: 0.8rem; width: 100%; display: none ">
-                        </div>
-                        <div id="AircraftsTable" style="font-size: 0.8rem; width: 100%; display: none ">
-                        </div>
-                        <div id="AllAircraftsTable" style="font-size: 0.8rem; width: 100%; display: none ">
-                        </div>
-
-                    </div>
-
-                    <!-- 浮动列表 - Top 5 旅游城市 -->
-                    <div class="topPopup" id="topTravelCitiesPopup">
-                        <div style="font-size: 0.75rem; color: rgba(255,255,255,0.6); margin-bottom: 8px;">
-                            🏆 Most Visited Cities
-                        </div>
-                        <div id="topTravelCitiesList" style="font-size: 0.8rem;">
-                            <!-- 动态生成 -->
-                        </div>
-                    </div>
-
-                    <!-- 浮动列表 - Top 5 外国城市 -->
-                    <div class="topPopup" id="topTravelForeignCitiesPopup">
-                        <div style="font-size: 0.75rem; color: rgba(255,255,255,0.6); margin-bottom: 8px;">
-                            🏆 Most Visited Foreign Cities
-                        </div>
-                        <div id="topTravelForeignCitiesList" style="font-size: 0.8rem;">
-                            <!-- 动态生成 -->
-                        </div>
-                    </div>
-
-                    <!-- 浮动列表 - Top 5 国家 -->
-                    <div class="topPopup" id="topTravelCountriesPopup">
-                        <div style="font-size: 0.75rem; color: rgba(255,255,255,0.6); margin-bottom: 8px;">
-                            🏆 Most Visited Countries
-                        </div>
-                        <div id="topTravelCountriesList" style="font-size: 0.8rem;">
-                            <!-- 动态生成 -->
-                        </div>
-                    </div>
-
-                    <!-- 浮动列表 - Top 5 机场 -->
-                    <div class="topPopup" id="topAirportsPopup">
-                        <div style="font-size: 0.75rem; color: rgba(255,255,255,0.6); margin-bottom: 8px;">
-                            🏆 Most Visited Airports
-                        </div>
-                        <div id="topAirportsList" style="font-size: 0.8rem;">
-                            <!-- 动态生成 -->
-                        </div>
-                    </div>
-
-                </div>
-
-                <!-- ========== 火车统计面板 ========== -->
-                <div class="stats-panel" id="stats-train">
-                    <!-- 概览卡片 -->
-                    <div class="stats-grid" id="trainStatsGrid"></div>
-
-                    <!-- 行程分布 -->
-                    <div class="chart-container">
-                        <div class="chart-section-title">🥧 列车类型分布</div>
-                        <canvas id="trainOverviewChart"></canvas>
-                    </div>
-
-                    <hr class="section-divider">
-
-                    <!-- 极值记录 -->
-                    <div class="chart-container">
-                        <div class="chart-section-title">🏅 行程记录</div>
-                        <div id="trainRecords" style="font-size: 0.8rem; color: rgba(255,255,255,0.7);">
-                            <!-- 动态生成 -->
-                        </div>
-                    </div>
-
-                    <hr class="section-divider">
-
-                    <!-- 四至车站 -->
-                    <div class="chart-container">
-                        <div class="chart-section-title">🧭 四至车站</div>
-                        <div id="fourCorners" style="font-size: 0.8rem; color: rgba(255,255,255,0.7);">
-                            <!-- 动态生成 -->
-                        </div>
-                    </div>
-
-                    <hr class="section-divider">
-                    <!-- 统计面板 -->
-                    <div class="chart-container">
-                        <!-- 书页式标签栏：完全类似浏览器顶端的书签样式 -->
-                        <div class="tabs-header" style="display: flex; gap: 0.25rem; height: 40px">
-                            <button class="tab-btn active" id="tabtrainTypeBtn"> 车型统计 </button>
-                            <button class="tab-btn" id="tabStationsBtn"> 车站统计 </button>
-                            <button class="tab-btn" id="tabTrainCitiesBtn"> 城市统计 </button>
-                            <button class="tab-btn" id="tabRailProvincesBtn"> 省份统计 </button>
-                            <button class="tab-btn" id="tabRailLinesBtn"> 线路统计 </button>
-                        </div>
-                        <div id="trainTypeTable" style="font-size: 0.8rem; width: 100%; display: block">
-                            <!-- 动态生成 -->
-                        </div>
-                        <div id="StationsTable" style="font-size: 0.8rem; width: 100%; display: none">
-                            <!-- 动态生成 -->
-                        </div>
-                        <div id="TrainCitiesTable" style="font-size: 0.8rem; width: 100%; display: none">
-                            <!-- 动态生成 -->
-                        </div>
-                        <div id="RailProvincesTable" style="font-size: 0.8rem; width: 100%; display: none">
-                            <!-- 动态生成 -->
-                        </div>
-                        <div id="RailLinesTable" style="font-size: 0.8rem; width: 100%; display: none">
-                            <!-- 动态生成 -->
-                        </div>
-                    </div>
-
-                    
-
-                </div>
-
-
-                
-
-
-                <!-- 浮动列表 - Top 5 车站 -->
-                <div class="topPopup" id="topStationsPopup">
-                    <div style="font-size: 0.75rem; color: rgba(255,255,255,0.6); margin-bottom: 8px;">
-                        🏆 Most Visited Stations
-                    </div>
-                    <div id="topStationsList" style="font-size: 0.8rem;">
-                        <!-- 动态生成 -->
-                    </div>
-                </div>
-
-                <!-- 浮动列表 - Top 5 城市 -->
-                <div class="topPopup" id="topCitiesPopup">
-                    <div style="font-size: 0.75rem; color: rgba(255,255,255,0.6); margin-bottom: 8px;">
-                        🏆 Most Visited Cities
-                    </div>
-                    <div id="topCitiesList_railway" style="font-size: 0.8rem;">
-                        <!-- 动态生成 -->
-                    </div>
-                </div>
-
-                <!-- 浮动列表 - Top 5 省 -->
-                <div class="topPopup" id="topProvsPopup">
-                    <div style="font-size: 0.75rem; color: rgba(255,255,255,0.6); margin-bottom: 8px;">
-                        🏆 Most Visited Provs
-                    </div>
-                    <div id="topProvsList_railway" style="font-size: 0.8rem;">
-                        <!-- 动态生成 -->
-                    </div>
-                </div>
-
-            </div>
-        </aside>
-
-        <!-- Scripts -->
-        <script src="https://d3js.org/d3.v7.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.4.0"></script>
-        <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
-        <script src="static/js/travel-map.js?v=sidebar-auto-1"></script>
+    <div class="footer">
+        基于 <a href="https://github.com/Ethenone/Travel-map" target="_blank" rel="noopener">Ethenone/Travel-map</a> 修改<br>
+        仅供个人学习与交流使用
     </div>
 </body>
 </html>
