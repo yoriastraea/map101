@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>一生足迹</title>
+  <link rel="icon" type="image/x-icon" href="static/assets/favicon.ico">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <style>
+    :root{--bg:#07111f;--panel:#0f1a2a;--line:rgba(148,184,218,.16);--muted:#7a8ea1;--text:#e0e6ed;--accent:#4dd7d0;--toolbar:54px;--air:#ff6b7a;--train:#4dd7d0;--road:#ffc66d;--walk:#65a9ff;--bike:#6dd4a0;--custom:#8ba3ff}
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif}
+    button{font:inherit;color:inherit;border:none;background:none;cursor:pointer}
+    a{color:inherit;text-decoration:none}
+
+    /* topbar */
+    .topbar{height:var(--toolbar);display:flex;align-items:center;padding:0 16px;border-bottom:1px solid var(--line);background:rgba(7,17,31,.97);gap:14px;position:relative;z-index:1000}
+    .brand{display:flex;align-items:center;gap:10px;min-width:160px}
+    .brand-mark{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:linear-gradient(135deg,#4dd7d0,#65a9ff);font-size:16px}
+    .brand strong{font-size:17px;font-weight:700}
+    .brand small{color:var(--muted);font-size:9px;letter-spacing:.12em;text-transform:uppercase;margin-left:6px}
+    .page-tabs{display:flex;padding:3px;gap:3px;border:1px solid var(--line);border-radius:10px;background:#0d1a2e}
+    .page-tab{height:28px;padding:0 11px;display:flex;align-items:center;gap:6px;border-radius:7px;color:#7a8ea1;font-size:11px;font-weight:700;transition:.15s}
+    .page-tab:hover{color:var(--text);background:#162a42}
+    .page-tab.active{color:#07111f;background:linear-gradient(135deg,#a8f3ec,#64d7cf)}
+
+    /* map */
+    .map-wrap{position:absolute;inset:var(--toolbar) 0 0 0}
+    #map{width:100%;height:100%}
+    .leaflet-control-zoom{border:1px solid var(--line)!important;border-radius:9px!important;overflow:hidden}
+    .leaflet-control-zoom a{border:0!important;background:rgba(15,26,42,.92)!important;color:var(--text)!important}
+    .leaflet-control-attribution{background:rgba(7,17,31,.8)!important;color:var(--muted)!important}
+    .leaflet-control-attribution a{color:#65a9ff!important}
+
+    /* floating panels */
+    .float-panel{position:absolute;z-index:600;background:rgba(7,17,31,.92);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.3)}
+
+    /* mode selector - top left */
+    .mode-panel{top:calc(var(--toolbar) + 12px);left:16px;padding:8px 10px;display:flex;gap:6px}
+    .mode-btn{height:34px;padding:0 12px;border:1px solid var(--line);border-radius:8px;background:#121f33;font-size:12px;display:flex;align-items:center;gap:6px;transition:.18s;color:var(--muted)}
+    .mode-btn:hover{border-color:rgba(77,215,208,.4);background:#162a42;color:var(--text)}
+    .mode-btn.active{color:#07111f;font-weight:700;border-color:transparent}
+    .mode-btn[data-mode="air"].active{background:var(--air)}
+    .mode-btn[data-mode="train"].active{background:var(--train)}
+    .mode-btn[data-mode="road"].active{background:var(--road)}
+    .mode-btn[data-mode="walk"].active{background:var(--walk)}
+    .mode-btn[data-mode="bike"].active{background:var(--bike)}
+
+    /* draw controls - bottom center */
+    .draw-panel{bottom:16px;left:50%;transform:translateX(-50%);padding:8px 10px;display:flex;gap:6px;align-items:center}
+    .draw-btn{height:36px;padding:0 14px;border:1px solid var(--line);border-radius:8px;background:#121f33;font-size:12px;display:flex;align-items:center;gap:6px;transition:.18s;color:var(--text)}
+    .draw-btn:hover{border-color:rgba(77,215,208,.4);background:#162a42}
+    .draw-btn.primary{background:var(--accent);color:#07111f;border-color:var(--accent);font-weight:700}
+    .draw-btn.danger{color:#ff6b7a;border-color:rgba(255,107,122,.3)}
+    .draw-btn.danger:hover{background:rgba(255,107,122,.12)}
+    .draw-btn:disabled{opacity:.4;pointer-events:none}
+
+    /* GPX controls - top right area */
+    .gpx-panel{top:calc(var(--toolbar) + 12px);right:16px;padding:8px 10px;display:flex;gap:6px}
+    .gpx-btn{height:34px;padding:0 12px;border:1px solid var(--line);border-radius:8px;background:#121f33;font-size:12px;display:flex;align-items:center;gap:6px;transition:.18s;color:var(--text)}
+    .gpx-btn:hover{border-color:rgba(77,215,208,.4);background:#162a42}
+
+    /* path list drawer - bottom */
+    .drawer-toggle{position:absolute;bottom:70px;left:50%;transform:translateX(-50%);z-index:600;height:30px;padding:0 16px;border:1px solid var(--line);border-radius:8px 8px 0 0;background:rgba(7,17,31,.92);backdrop-filter:blur(10px);font-size:11px;color:var(--muted);display:flex;align-items:center;gap:6px;cursor:pointer;transition:.18s}
+    .drawer-toggle:hover{color:var(--text);background:rgba(15,26,42,.95)}
+    .drawer{position:absolute;bottom:0;left:0;right:0;z-index:590;background:rgba(7,17,31,.95);backdrop-filter:blur(12px);border-top:1px solid var(--line);max-height:40vh;overflow-y:auto;transform:translateY(100%);transition:transform .3s ease;padding:16px}
+    .drawer.open{transform:translateY(0)}
+    .drawer-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+    .drawer-header h3{font-size:14px;font-weight:700}
+    .drawer-close{font-size:18px;color:var(--muted);cursor:pointer;padding:4px 8px}
+    .drawer-close:hover{color:var(--text)}
+    .path-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;margin-bottom:8px;background:rgba(15,26,42,.6);transition:.18s;cursor:pointer}
+    .path-item:hover{border-color:rgba(77,215,208,.3);background:rgba(22,42,66,.6)}
+    .path-icon{width:32px;height:32px;border-radius:8px;display:grid;place-items:center;font-size:16px;flex-shrink:0}
+    .path-info{flex:1;min-width:0}
+    .path-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .path-meta{font-size:11px;color:var(--muted);display:flex;gap:8px;margin-top:2px}
+    .path-tag{display:inline-block;padding:1px 6px;border-radius:4px;font-size:10px;font-weight:600}
+    .path-delete{width:28px;height:28px;border-radius:6px;display:grid;place-items:center;color:var(--muted);transition:.18s;flex-shrink:0}
+    .path-delete:hover{color:#ff6b7a;background:rgba(255,107,122,.1)}
+    .empty-paths{text-align:center;padding:24px;color:var(--muted);font-size:13px}
+
+    /* toast */
+    .toast{position:fixed;top:70px;left:50%;transform:translateX(-50%) translateY(-14px);z-index:2000;padding:10px 16px;border:1px solid var(--line);border-radius:9px;background:var(--panel);color:var(--text);font-size:12px;opacity:0;pointer-events:none;transition:.25s;box-shadow:0 4px 16px rgba(0,0,0,.3)}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+    /* waypoint markers */
+    .waypoint-marker{width:10px;height:10px;border-radius:50%;background:var(--accent);border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4)}
+
+    /* name input modal */
+    .modal-overlay{position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center}
+    .modal-overlay.show{display:flex}
+    .modal{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:24px;width:90%;max-width:360px;box-shadow:0 12px 40px rgba(0,0,0,.5)}
+    .modal h3{font-size:16px;margin-bottom:14px}
+    .modal input{width:100%;height:38px;padding:0 12px;border:1px solid var(--line);border-radius:8px;background:#121f33;color:var(--text);font-size:13px;outline:none}
+    .modal input:focus{border-color:var(--accent)}
+    .modal-actions{display:flex;gap:8px;margin-top:16px;justify-content:flex-end}
+    .modal-btn{height:34px;padding:0 16px;border-radius:8px;font-size:12px;font-weight:600;transition:.18s}
+    .modal-btn.cancel{border:1px solid var(--line);background:#121f33;color:var(--text)}
+    .modal-btn.cancel:hover{background:#162a42}
+    .modal-btn.confirm{background:var(--accent);color:#07111f}
+    .modal-btn.confirm:hover{opacity:.9}
+
+    @media(max-width:760px){
+      .brand small{display:none}
+      .page-tabs{display:none}
+      .mode-panel{left:8px;right:8px;top:calc(var(--toolbar) + 8px);overflow-x:auto}
+      .mode-btn{flex-shrink:0;padding:0 10px;font-size:11px;height:30px}
+      .gpx-panel{right:8px;top:auto;bottom:70px}
+      .draw-panel{bottom:8px;left:8px;right:8px;transform:none;justify-content:center}
+      .draw-btn{height:32px;padding:0 10px;font-size:11px}
+      .drawer-toggle{bottom:56px}
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark">🗺️</span><strong>一生足迹</strong><small>Footprint</small></div>
+    <nav class="page-tabs">
+      <a class="page-tab" href="index.html">首页</a>
+      <a class="page-tab" href="TravelAtlas.html">行程</a>
+      <a class="page-tab" href="TravelAtlasCity.html">城市</a>
+      <a class="page-tab" href="Trail.html">足迹</a>
+      <a class="page-tab active" href="Footprint.html">轨迹</a>
+      <a class="page-tab" href="Summary.html">总览</a>
+    </nav>
+  </header>
+
+  <div class="map-wrap">
+    <div id="map"></div>
+
+    <!-- Mode selector -->
+    <div class="float-panel mode-panel" id="modePanel">
+      <button class="mode-btn active" data-mode="air">✈️ 飞机</button>
+      <button class="mode-btn" data-mode="train">🚆 火车</button>
+      <button class="mode-btn" data-mode="road">🚗 公路</button>
+      <button class="mode-btn" data-mode="walk">🚶 步行</button>
+      <button class="mode-btn" data-mode="bike">🚴 骑行</button>
+    </div>
+
+    <!-- GPX controls -->
+    <div class="float-panel gpx-panel">
+      <button class="gpx-btn" id="importGpxBtn">📂 导入GPX</button>
+      <button class="gpx-btn" id="exportGpxBtn">💾 导出GPX</button>
+      <input type="file" id="gpxFileInput" accept=".gpx" hidden>
+    </div>
+
+    <!-- Draw controls -->
+    <div class="float-panel draw-panel" id="drawPanel">
+      <button class="draw-btn primary" id="startDrawBtn">🖊️ 开始绘制</button>
+      <button class="draw-btn" id="undoBtn" disabled>↩️ 撤销</button>
+      <button class="draw-btn danger" id="finishDrawBtn" disabled>✅ 完成</button>
+    </div>
+
+    <!-- Drawer toggle -->
+    <button class="drawer-toggle" id="drawerToggle">▼ 路径列表 (<span id="pathCount">0</span>)</button>
+
+    <!-- Path list drawer -->
+    <div class="drawer" id="drawer">
+      <div class="drawer-header">
+        <h3>路径列表</h3>
+        <span class="drawer-close" id="drawerClose">✕</span>
+      </div>
+      <div id="pathList"></div>
+    </div>
+  </div>
+
+  <!-- Name input modal -->
+  <div class="modal-overlay" id="nameModal">
+    <div class="modal">
+      <h3>保存路径</h3>
+      <input type="text" id="pathNameInput" placeholder="路径名称">
+      <div class="modal-actions">
+        <button class="modal-btn cancel" id="nameCancel">取消</button>
+        <button class="modal-btn confirm" id="nameConfirm">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+  (() => {
+    'use strict';
+    const $ = s => document.querySelector(s);
+    const $$ = s => document.querySelectorAll(s);
+
+    const STORAGE_KEY = 'footprintPaths';
+    const MODE_COLORS = { air: '#ff6b7a', train: '#4dd7d0', road: '#ffc66d', walk: '#65a9ff', bike: '#6dd4a0', custom: '#8ba3ff' };
+    const MODE_ICONS = { air: '✈️', train: '🚆', road: '🚗', walk: '🚶', bike: '🚴', custom: '📍' };
+    const MODE_LABELS = { air: '航空', train: '铁路', road: '公路', walk: '步行', bike: '骑行', custom: '自定义' };
+    const OSRM_PROFILES = { road: 'driving', walk: 'walking', bike: 'cycling' };
+
+    const state = {
+      map: null,
+      mode: 'air',
+      drawing: false,
+      waypoints: [],
+      previewLine: null,
+      waypointMarkers: [],
+      paths: [],
+      pathLayers: {},
+      drawerOpen: false
+    };
+
+    const toast = msg => {
+      const el = $('#toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      clearTimeout(el._t);
+      el._t = setTimeout(() => el.classList.remove('show'), 2500);
+    };
+
+    // ---- Map init ----
+    function initMap() {
+      state.map = L.map('map', { zoomControl: false, minZoom: 2, maxZoom: 18 }).setView([35, 105], 4);
+      L.control.zoom({ position: 'bottomright' }).addTo(state.map);
+      L.tileLayer('https://webrd04.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}', {
+        maxZoom: 18, attribution: '© 高德地图'
+      }).addTo(state.map);
+      state.map.on('click', onMapClick);
+    }
+
+    // ---- Great circle ----
+    function greatCirclePoints(start, end, n = 50) {
+      const lat1 = start[0] * Math.PI / 180, lon1 = start[1] * Math.PI / 180;
+      const lat2 = end[0] * Math.PI / 180, lon2 = end[1] * Math.PI / 180;
+      const d = 2 * Math.asin(Math.sqrt(Math.sin((lat1 - lat2) / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin((lon1 - lon2) / 2) ** 2));
+      if (d === 0) return [start];
+      const pts = [];
+      for (let i = 0; i <= n; i++) {
+        const f = i / n;
+        const A = Math.sin((1 - f) * d) / Math.sin(d);
+        const B = Math.sin(f * d) / Math.sin(d);
+        const x = A * Math.cos(lat1) * Math.cos(lon1) + B * Math.cos(lat2) * Math.cos(lon2);
+        const y = A * Math.cos(lat1) * Math.sin(lon1) + B * Math.cos(lat2) * Math.sin(lon2);
+        const z = A * Math.sin(lat1) + B * Math.sin(lat2);
+        pts.push([Math.atan2(z, Math.sqrt(x * x + y * y)) * 180 / Math.PI, Math.atan2(y, x) * 180 / Math.PI]);
+      }
+      return pts;
+    }
+
+    // ---- OSRM route ----
+    async function fetchRoute(profile, waypoints) {
+      const coords = waypoints.map(w => `${w[1]},${w[0]}`).join(';');
+      const url = `https://router.project-osrm.org/route/v1/${profile}/${coords}?overview=full&geometries=geojson&steps=false`;
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 10000);
+      try {
+        const res = await fetch(url, { signal: controller.signal });
+        clearTimeout(timeout);
+        const data = await res.json();
+        if (data.code === 'Ok' && data.routes?.length) {
+          return data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
+        }
+      } catch (e) {
+        clearTimeout(timeout);
+      }
+      return null;
+    }
+
+    // ---- Process waypoints into rendered points ----
+    async function processWaypoints(waypoints, mode) {
+      if (waypoints.length < 2) return waypoints;
+
+      if (mode === 'air') {
+        // Great circle between first and last
+        return greatCirclePoints(waypoints[0], waypoints[waypoints.length - 1]);
+      }
+
+      if (mode === 'train') {
+        // Straight lines connecting all waypoints
+        const pts = [];
+        for (let i = 0; i < waypoints.length - 1; i++) {
+          const seg = greatCirclePoints(waypoints[i], waypoints[i + 1], 20);
+          if (pts.length > 0) seg.shift(); // avoid duplicate join point
+          pts.push(...seg);
+        }
+        return pts;
+      }
+
+      if (OSRM_PROFILES[mode]) {
+        toast('正在获取路线…');
+        const route = await fetchRoute(OSRM_PROFILES[mode], waypoints);
+        if (route) {
+          toast('路线获取成功');
+          return route;
+        }
+        toast('路线获取失败，使用直线连接');
+      }
+
+      // Fallback: straight lines
+      return waypoints.slice();
+    }
+
+    // ---- Drawing ----
+    function onMapClick(e) {
+      if (!state.drawing) return;
+      const latlng = [e.latlng.lat, e.latlng.lng];
+      state.waypoints.push(latlng);
+
+      // Add waypoint marker
+      const icon = L.divIcon({ className: 'waypoint-marker', iconSize: [10, 10], iconAnchor: [5, 5] });
+      const marker = L.marker(latlng, { icon, interactive: false }).addTo(state.map);
+      state.waypointMarkers.push(marker);
+
+      // Update preview line
+      updatePreview();
+      updateDrawButtons();
+    }
+
+    function updatePreview() {
+      if (state.previewLine) {
+        state.map.removeLayer(state.previewLine);
+        state.previewLine = null;
+      }
+      if (state.waypoints.length >= 2) {
+        const color = MODE_COLORS[state.mode];
+        state.previewLine = L.polyline(state.waypoints, {
+          color, weight: 2.5, opacity: 0.7, dashArray: '8,6'
+        }).addTo(state.map);
+      }
+    }
+
+    function updateDrawButtons() {
+      $('#undoBtn').disabled = state.waypoints.length === 0;
+      $('#finishDrawBtn').disabled = state.waypoints.length < 2;
+    }
+
+    function startDrawing() {
+      state.drawing = true;
+      state.waypoints = [];
+      clearWaypointMarkers();
+      if (state.previewLine) { state.map.removeLayer(state.previewLine); state.previewLine = null; }
+      $('#startDrawBtn').textContent = '🛑 结束绘制';
+      $('#startDrawBtn').classList.remove('primary');
+      $('#startDrawBtn').classList.add('danger');
+      $('#undoBtn').disabled = true;
+      $('#finishDrawBtn').disabled = true;
+      $('#modePanel').style.pointerEvents = 'none';
+      $('#modePanel').style.opacity = '0.5';
+      state.map.getContainer().style.cursor = 'crosshair';
+    }
+
+    function stopDrawing() {
+      state.drawing = false;
+      $('#startDrawBtn').textContent = '🖊️ 开始绘制';
+      $('#startDrawBtn').classList.add('primary');
+      $('#startDrawBtn').classList.remove('danger');
+      $('#modePanel').style.pointerEvents = '';
+      $('#modePanel').style.opacity = '';
+      state.map.getContainer().style.cursor = '';
+    }
+
+    function clearWaypointMarkers() {
+      state.waypointMarkers.forEach(m => state.map.removeLayer(m));
+      state.waypointMarkers = [];
+    }
+
+    function undoWaypoint() {
+      if (state.waypoints.length === 0) return;
+      state.waypoints.pop();
+      const marker = state.waypointMarkers.pop();
+      if (marker) state.map.removeLayer(marker);
+      updatePreview();
+      updateDrawButtons();
+    }
+
+    async function finishDrawing() {
+      if (state.waypoints.length < 2) return;
+      const waypoints = state.waypoints.slice();
+      const mode = state.mode;
+
+      // Clean up drawing state
+      clearWaypointMarkers();
+      if (state.previewLine) { state.map.removeLayer(state.previewLine); state.previewLine = null; }
+      stopDrawing();
+
+      // Process route
+      const points = await processWaypoints(waypoints, mode);
+
+      // Show name modal
+      const defaultName = `${MODE_LABELS[mode]} ${new Date().toISOString().slice(0, 10)}`;
+      showNameModal(defaultName, (name) => {
+        const path = {
+          id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+          name,
+          mode,
+          points,
+          date: new Date().toISOString().slice(0, 10),
+          color: MODE_COLORS[mode]
+        };
+        state.paths.push(path);
+        savePaths();
+        addPathToMap(path);
+        renderPathList();
+        toast('路径已保存');
+      });
+    }
+
+    // ---- Path rendering on map ----
+    function addPathToMap(path) {
+      const color = path.color || MODE_COLORS[path.mode] || MODE_COLORS.custom;
+      const polyline = L.polyline(path.points, {
+        color, weight: 3, opacity: 0.85, smoothFactor: 1
+      }).addTo(state.map);
+      polyline.bindTooltip(
+        `<strong>${path.name}</strong><br>${MODE_LABELS[path.mode] || path.mode} · ${path.points.length} 点`,
+        { sticky: true }
+      );
+      state.pathLayers[path.id] = polyline;
+    }
+
+    function renderAllPaths() {
+      // Clear existing
+      Object.values(state.pathLayers).forEach(l => state.map.removeLayer(l));
+      state.pathLayers = {};
+      state.paths.forEach(p => addPathToMap(p));
+    }
+
+    // ---- Path list ----
+    function renderPathList() {
+      const el = $('#pathList');
+      $('#pathCount').textContent = state.paths.length;
+      if (!state.paths.length) {
+        el.innerHTML = '<div class="empty-paths">暂无路径，点击"开始绘制"添加</div>';
+        return;
+      }
+      el.innerHTML = state.paths.slice().reverse().map(p => `
+        <div class="path-item" data-id="${p.id}">
+          <div class="path-icon" style="background:${hexToRgba(p.color || MODE_COLORS[p.mode], .15)};color:${p.color || MODE_COLORS[p.mode]}">${MODE_ICONS[p.mode] || '📍'}</div>
+          <div class="path-info">
+            <div class="path-name">${escapeHtml(p.name)}</div>
+            <div class="path-meta">
+              <span class="path-tag" style="background:${hexToRgba(p.color || MODE_COLORS[p.mode], .15)};color:${p.color || MODE_COLORS[p.mode]}">${MODE_LABELS[p.mode] || p.mode}</span>
+              <span>${p.points.length} 点</span>
+              <span>${p.date || ''}</span>
+            </div>
+          </div>
+          <button class="path-delete" data-delete="${p.id}" title="删除">🗑️</button>
+        </div>
+      `).join('');
+
+      // Bind events
+      el.querySelectorAll('.path-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+          if (e.target.closest('.path-delete')) return;
+          const id = item.dataset.id;
+          const layer = state.pathLayers[id];
+          if (layer) state.map.fitBounds(layer.getBounds(), { padding: [40, 40] });
+        });
+      });
+      el.querySelectorAll('.path-delete').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          deletePath(btn.dataset.delete);
+        });
+      });
+    }
+
+    function deletePath(id) {
+      state.paths = state.paths.filter(p => p.id !== id);
+      if (state.pathLayers[id]) {
+        state.map.removeLayer(state.pathLayers[id]);
+        delete state.pathLayers[id];
+      }
+      savePaths();
+      renderPathList();
+      toast('路径已删除');
+    }
+
+    // ---- GPX Export ----
+    function escapeXml(s) {
+      return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+    }
+
+    function exportGPX() {
+      if (!state.paths.length) { toast('暂无路径可导出'); return; }
+      let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
+      xml += '<gpx version="1.1" creator="Travel-map" xmlns="http://www.topografix.com/GPX/1/1">\n';
+      for (const path of state.paths) {
+        xml += `  <trk>\n    <name>${escapeXml(path.name)}</name>\n    <trkseg>\n`;
+        for (const pt of path.points) {
+          xml += `      <trkpt lat="${pt[0].toFixed(6)}" lon="${pt[1].toFixed(6)}"></trkpt>\n`;
+        }
+        xml += '    </trkseg>\n  </trk>\n';
+      }
+      xml += '</gpx>';
+
+      const blob = new Blob([xml], { type: 'application/gpx+xml' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `footprint_${new Date().toISOString().slice(0, 10)}.gpx`;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast('GPX 已导出');
+    }
+
+    // ---- GPX Import ----
+    function importGPX(file) {
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(e.target.result, 'application/xml');
+          if (doc.querySelector('parsererror')) throw new Error('XML 解析失败');
+
+          const trks = doc.querySelectorAll('trk');
+          if (!trks.length) throw new Error('未找到轨迹数据');
+
+          let count = 0;
+          trks.forEach(trk => {
+            const name = trk.querySelector('name')?.textContent || `导入 ${new Date().toISOString().slice(0, 10)}`;
+            const trkpts = trk.querySelectorAll('trkpt');
+            const points = [];
+            trkpts.forEach(pt => {
+              const lat = parseFloat(pt.getAttribute('lat'));
+              const lon = parseFloat(pt.getAttribute('lon'));
+              if (!isNaN(lat) && !isNaN(lon)) points.push([lat, lon]);
+            });
+            if (points.length >= 2) {
+              const path = {
+                id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+                name,
+                mode: 'custom',
+                points,
+                date: new Date().toISOString().slice(0, 10),
+                color: MODE_COLORS.custom
+              };
+              state.paths.push(path);
+              addPathToMap(path);
+              count++;
+            }
+          });
+
+          savePaths();
+          renderPathList();
+          toast(`已导入 ${count} 条轨迹`);
+
+          // Fit to imported paths
+          const allLayers = state.paths.filter(p => p.mode === 'custom').map(p => state.pathLayers[p.id]).filter(Boolean);
+          if (allLayers.length) {
+            const group = L.featureGroup(allLayers);
+            state.map.fitBounds(group.getBounds(), { padding: [40, 40] });
+          }
+        } catch (err) {
+          toast('导入失败: ' + err.message);
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    // ---- Persistence ----
+    function savePaths() {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state.paths)); } catch (e) {}
+    }
+
+    function loadPaths() {
+      try {
+        const d = localStorage.getItem(STORAGE_KEY);
+        if (d) { state.paths = JSON.parse(d); return true; }
+      } catch (e) {}
+      return false;
+    }
+
+    // ---- Name modal ----
+    function showNameModal(defaultName, callback) {
+      const modal = $('#nameModal');
+      const input = $('#pathNameInput');
+      input.value = defaultName;
+      modal.classList.add('show');
+      input.focus();
+      input.select();
+
+      const confirm = () => {
+        modal.classList.remove('show');
+        cleanup();
+        callback(input.value.trim() || defaultName);
+      };
+      const cancel = () => {
+        modal.classList.remove('show');
+        cleanup();
+      };
+      const onKey = (e) => { if (e.key === 'Enter') confirm(); if (e.key === 'Escape') cancel(); };
+      const cleanup = () => {
+        $('#nameConfirm').removeEventListener('click', confirm);
+        $('#nameCancel').removeEventListener('click', cancel);
+        input.removeEventListener('keydown', onKey);
+      };
+      $('#nameConfirm').addEventListener('click', confirm);
+      $('#nameCancel').addEventListener('click', cancel);
+      input.addEventListener('keydown', onKey);
+    }
+
+    // ---- Helpers ----
+    function hexToRgba(hex, alpha) {
+      const r = parseInt(hex.slice(1, 3), 16);
+      const g = parseInt(hex.slice(3, 5), 16);
+      const b = parseInt(hex.slice(5, 7), 16);
+      return `rgba(${r},${g},${b},${alpha})`;
+    }
+
+    function escapeHtml(s) {
+      const d = document.createElement('div');
+      d.textContent = s;
+      return d.innerHTML;
+    }
+
+    // ---- Event bindings ----
+    function bindEvents() {
+      // Mode selection
+      $$('.mode-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (state.drawing) return;
+          $$('.mode-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          state.mode = btn.dataset.mode;
+        });
+      });
+
+      // Draw controls
+      $('#startDrawBtn').addEventListener('click', () => {
+        if (state.drawing) {
+          stopDrawing();
+          clearWaypointMarkers();
+          if (state.previewLine) { state.map.removeLayer(state.previewLine); state.previewLine = null; }
+          state.waypoints = [];
+          updateDrawButtons();
+        } else {
+          startDrawing();
+        }
+      });
+      $('#undoBtn').addEventListener('click', undoWaypoint);
+      $('#finishDrawBtn').addEventListener('click', finishDrawing);
+
+      // GPX
+      $('#importGpxBtn').addEventListener('click', () => $('#gpxFileInput').click());
+      $('#gpxFileInput').addEventListener('change', (e) => {
+        const f = e.target.files[0];
+        e.target.value = '';
+        importGPX(f);
+      });
+      $('#exportGpxBtn').addEventListener('click', exportGPX);
+
+      // Drawer
+      $('#drawerToggle').addEventListener('click', () => {
+        state.drawerOpen = !state.drawerOpen;
+        $('#drawer').classList.toggle('open', state.drawerOpen);
+        $('#drawerToggle').textContent = state.drawerOpen
+          ? `▲ 路径列表 (${state.paths.length})`
+          : `▼ 路径列表 (${state.paths.length})`;
+      });
+      $('#drawerClose').addEventListener('click', () => {
+        state.drawerOpen = false;
+        $('#drawer').classList.remove('open');
+        $('#drawerToggle').textContent = `▼ 路径列表 (${state.paths.length})`;
+      });
+    }
+
+    // ---- Init ----
+    initMap();
+    loadPaths();
+    renderAllPaths();
+    renderPathList();
+    bindEvents();
+  })();
+  </script>
+</body>
+</html>
