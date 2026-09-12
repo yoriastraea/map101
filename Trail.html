@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>足迹轨迹</title>
+  <link rel="icon" type="image/x-icon" href="static/assets/favicon.ico">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <style>
+    :root{--bg:#07111f;--panel:#0f1a2a;--line:rgba(148,184,218,.16);--muted:#7a8ea1;--text:#e0e6ed;--accent:#4dd7d0;--toolbar:58px}
+    *{box-sizing:border-box}html,body{height:100%;margin:0;overflow:hidden;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif}button{font:inherit;color:inherit}
+    .topbar{height:var(--toolbar);display:flex;align-items:center;padding:0 16px;border-bottom:1px solid var(--line);background:rgba(7,17,31,.97);gap:14px;position:relative;z-index:1000}
+    .brand{display:flex;align-items:center;gap:10px;min-width:200px}.brand-mark{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:linear-gradient(135deg,#4dd7d0,#65a9ff);font-size:16px}.brand strong{font-size:18px;font-weight:700}.brand small{color:var(--muted);font-size:9px;letter-spacing:.12em;text-transform:uppercase;margin-left:6px}
+    .toolbar{display:flex;align-items:center;gap:7px;flex:1}.tool-btn{height:34px;padding:0 12px;border:1px solid var(--line);background:#121f33;border-radius:8px;cursor:pointer;font-size:12px;display:flex;align-items:center;gap:7px;transition:.18s;text-decoration:none;color:var(--text)}.tool-btn:hover{border-color:rgba(77,215,208,.4);background:#162a42}.tool-btn.primary{background:#4dd7d0;color:#07111f;border-color:#4dd7d0;font-weight:700}.toolbar-spacer{flex:1}
+    .page-tabs{display:flex;padding:3px;gap:3px;border:1px solid var(--line);border-radius:10px;background:#0d1a2e}.page-tab{height:28px;padding:0 11px;display:flex;align-items:center;gap:6px;border-radius:7px;color:#7a8ea1;text-decoration:none;font-size:11px;font-weight:700}.page-tab:hover{color:var(--text);background:#162a42}.page-tab.active{color:#07111f;background:linear-gradient(135deg,#a8f3ec,#64d7cf)}
+    .canvas{position:absolute;inset:var(--toolbar) 0 0 0;background:#06101c}
+    .map{width:100%;height:100%}
+    .leaflet-control-zoom{border:1px solid var(--line)!important;border-radius:9px!important;overflow:hidden}
+    .leaflet-control-zoom a{border:0!important;background:rgba(15,26,42,.92)!important;color:var(--text)!important}
+    .leaflet-control-attribution{background:rgba(7,17,31,.8)!important;color:var(--muted)!important}
+    .leaflet-control-attribution a{color:#65a9ff!important}
+    .overlay-panel{position:absolute;top:70px;left:16px;z-index:600;padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:rgba(7,17,31,.92);backdrop-filter:blur(10px);box-shadow:0 8px 24px rgba(0,0,0,.3);font-size:11px;color:var(--muted);pointer-events:none}
+    .overlay-panel strong{color:var(--text);font-size:14px;display:block;margin-bottom:2px}
+    .overlay-panel span{font-size:10px}
+    .toast{position:fixed;top:70px;left:50%;transform:translate(-50%,-14px);z-index:2000;padding:9px 14px;border:1px solid var(--line);border-radius:9px;background:var(--panel);color:var(--text);font-size:11px;opacity:0;pointer-events:none;transition:.2s;box-shadow:0 4px 16px rgba(0,0,0,.3)}.toast.show{opacity:1;transform:translate(-50%,0)}
+    @media(max-width:760px){.brand small,.brand-copy{display:none}.toolbar .tool-btn span{display:none}.tool-btn{padding:0 9px}}
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark">👣</span><span class="brand-copy"><strong>足迹轨迹</strong><small>Life Trail</small></span></div>
+    <nav class="toolbar">
+      <div class="page-tabs">
+        <a class="page-tab" href="index.html">首页</a>
+        <a class="page-tab" href="TravelAtlas.html">行程</a>
+        <a class="page-tab" href="TravelAtlasCity.html">城市</a>
+        <a class="page-tab active" href="Trail.html">足迹</a>
+      </div>
+      <input id="fileInput" type="file" accept=".csv" hidden>
+      <button class="tool-btn primary" id="importBtn"><i>📂</i><span>导入轨迹</span></button>
+      <button class="tool-btn" id="clearBtn"><i>🗑️</i><span>清空</span></button>
+      <button class="tool-btn" id="fitBtn"><i>🔍</i><span>适应视图</span></button>
+      <div class="toolbar-spacer"></div>
+    </nav>
+  </header>
+  <div class="canvas">
+    <div id="map" class="map"></div>
+    <div class="overlay-panel" id="infoPanel">
+      <strong id="infoTitle">足迹轨迹</strong>
+      <span id="infoText">导入 CSV 开始查看</span>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+  (() => {
+    'use strict';
+    const STORAGE_KEY = 'trailData';
+    const API_BASE = '/api/trail'; // 预留服务器接口
+    const state = { map: null, trailLayer: null, points: [], segments: [] };
+    const $ = s => document.querySelector(s);
+    const toast = msg => { const el = $('#toast'); el.textContent = msg; el.classList.add('show'); clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('show'), 2200) };
+
+    function colorBySpeed(speed) {
+      if (speed < 0) return '#4dd7d0';
+      if (speed < 1.5) return '#4dd7d0';
+      if (speed < 5) return '#65a9ff';
+      if (speed < 15) return '#ffc66d';
+      if (speed < 30) return '#ff8c5a';
+      return '#ff4d6a';
+    }
+
+    function parseCSV(text) {
+      const lines = text.trim().split(/\r?\n/);
+      const headers = lines[0].split(',').map(h => h.trim());
+      const idx = { time: headers.indexOf('dataTime'), lon: headers.indexOf('longitude'), lat: headers.indexOf('latitude'), speed: headers.indexOf('speed'), alt: headers.indexOf('altitude'), type: headers.indexOf('locType') };
+      const points = [];
+      for (let i = 1; i < lines.length; i++) {
+        const cols = lines[i].split(',');
+        const lat = parseFloat(cols[idx.lat]), lon = parseFloat(cols[idx.lon]);
+        if (isNaN(lat) || isNaN(lon)) continue;
+        points.push({
+          time: parseInt(cols[idx.time]) || 0,
+          lat, lon,
+          speed: parseFloat(cols[idx.speed]) || 0,
+          alt: parseFloat(cols[idx.alt]) || 0,
+          type: parseInt(cols[idx.type]) || 0
+        });
+      }
+      return points.sort((a, b) => a.time - b.time);
+    }
+
+    function buildSegments(points) {
+      const segs = [];
+      let seg = [];
+      let lastTime = 0;
+      for (const p of points) {
+        if (seg.length > 0 && (p.time - lastTime) > 300) {
+          if (seg.length > 1) segs.push(seg);
+          seg = [];
+        }
+        seg.push(p);
+        lastTime = p.time;
+      }
+      if (seg.length > 1) segs.push(seg);
+      return segs;
+    }
+
+    function drawTrail() {
+      if (state.trailLayer) { state.map.removeLayer(state.trailLayer); state.trailLayer = null }
+      if (!state.points.length) { $('#infoText').textContent = '导入 CSV 开始查看'; return }
+
+      state.segments = buildSegments(state.points);
+      const group = L.featureGroup();
+
+      for (const seg of state.segments) {
+        const latlngs = seg.map(p => [p.lat, p.lon]);
+        const avgSpeed = seg.reduce((s, p) => s + p.speed, 0) / seg.length;
+        const color = colorBySpeed(avgSpeed);
+        const polyline = L.polyline(latlngs, { color, weight: 2.5, opacity: 0.75, smoothFactor: 1.5 }).addTo(group);
+        const startTime = new Date(seg[0].time * 1000);
+        const endTime = new Date(seg[seg.length - 1].time * 1000);
+        polyline.bindTooltip(
+          `<strong>${startTime.toLocaleDateString('zh-CN')}</strong><br>` +
+          `${startTime.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })} → ${endTime.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}<br>` +
+          `${seg.length} 点 · 均速 ${avgSpeed.toFixed(1)} m/s`,
+          { sticky: true, className: 'trail-tip' }
+        );
+      }
+
+      state.trailLayer = group.addTo(state.map);
+      const totalDist = state.points.reduce((s, p, i) => {
+        if (i === 0) return 0;
+        const prev = state.points[i - 1];
+        const R = 6371, dLat = (p.lat - prev.lat) * Math.PI / 180, dLon = (p.lon - prev.lon) * Math.PI / 180;
+        const a = Math.sin(dLat / 2) ** 2 + Math.cos(prev.lat * Math.PI / 180) * Math.cos(p.lat * Math.PI / 180) * Math.sin(dLon / 2) ** 2;
+        return s + 2 * R * Math.asin(Math.sqrt(a));
+      }, 0);
+      const days = Math.ceil((state.points[state.points.length - 1].time - state.points[0].time) / 86400);
+
+      $('#infoTitle').textContent = `${state.points.length.toLocaleString()} 个轨迹点`;
+      $('#infoText').textContent = `${state.segments.length} 段 · 总距离 ${totalDist.toFixed(0)} km · ${days} 天`;
+    }
+
+    function saveData() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state.points)) } catch (e) {} }
+    function loadData() { try { const d = localStorage.getItem(STORAGE_KEY); if (d) { state.points = JSON.parse(d); return true } } catch (e) {} return false }
+
+    // 预留服务器 API 接口
+    async function fetchFromServer() {
+      try {
+        const res = await fetch(`${API_BASE}/points`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.points && data.points.length) {
+            state.points = data.points;
+            saveData();
+            drawTrail();
+            if (state.trailLayer) state.map.fitBounds(state.trailLayer.getBounds(), { padding: [30, 30] });
+            toast('已从服务器加载');
+            return true;
+          }
+        }
+      } catch (e) {}
+      return false;
+    }
+
+    async function uploadToServer() {
+      try {
+        await fetch(`${API_BASE}/upload`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ points: state.points })
+        });
+        toast('已同步到服务器');
+      } catch (e) { toast('同步失败') }
+    }
+
+    function initMap() {
+      state.map = L.map('map', { zoomControl: false, minZoom: 2, maxZoom: 18 }).setView([35, 105], 4);
+      L.control.zoom({ position: 'bottomright' }).addTo(state.map);
+      L.tileLayer('https://webrd04.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}', {
+        maxZoom: 18, attribution: '© 高德地图'
+      }).addTo(state.map);
+    }
+
+    async function importFile(file) {
+      if (!file) return;
+      toast('正在解析…');
+      try {
+        const text = await file.text();
+        state.points = parseCSV(text);
+        if (!state.points.length) throw Error('未找到有效坐标');
+        saveData();
+        drawTrail();
+        if (state.trailLayer) state.map.fitBounds(state.trailLayer.getBounds(), { padding: [30, 30] });
+        toast(`已导入 ${state.points.length.toLocaleString()} 个轨迹点`);
+      } catch (e) { toast('导入失败：' + e.message) }
+    }
+
+    initMap();
+    if (!loadData()) fetchFromServer(); // 优先本地，其次服务器
+    if (state.points.length) { drawTrail(); if (state.trailLayer) state.map.fitBounds(state.trailLayer.getBounds(), { padding: [30, 30] }) }
+
+    $('#importBtn').onclick = () => $('#fileInput').click();
+    $('#fileInput').onchange = e => { const f = e.target.files[0]; e.target.value = ''; importFile(f) };
+    $('#clearBtn').onclick = () => { state.points = []; localStorage.removeItem(STORAGE_KEY); drawTrail(); toast('已清空') };
+    $('#fitBtn').onclick = () => { if (state.trailLayer) state.map.fitBounds(state.trailLayer.getBounds(), { padding: [30, 30] }) };
+  })();
+  </script>
+</body>
+</html>
