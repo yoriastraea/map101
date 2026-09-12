@@ -6,88 +6,150 @@
   <title>综合总览</title>
   <link rel="icon" type="image/x-icon" href="static/assets/favicon.ico">
   <style>
-    :root{--bg:#07111f;--panel:#0f1a2a;--line:rgba(148,184,218,.16);--muted:#7a8ea1;--text:#e0e6ed;--accent:#4dd7d0;--toolbar:58px;--air:#ff6b7a;--rail:#4dd7d0;--city:#5b78f5;--trail:#ffc66d}
-    *{box-sizing:border-box}html,body{height:100%;margin:0;overflow:hidden;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif}button{font:inherit;color:inherit}
-    .topbar{height:var(--toolbar);display:flex;align-items:center;padding:0 16px;border-bottom:1px solid var(--line);background:rgba(7,17,31,.97);gap:14px;position:relative;z-index:1000}
-    .brand{display:flex;align-items:center;gap:10px;min-width:200px}.brand-mark{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:linear-gradient(135deg,#4dd7d0,#65a9ff);font-size:16px}.brand strong{font-size:18px;font-weight:700}.brand small{color:var(--muted);font-size:9px;letter-spacing:.12em;text-transform:uppercase;margin-left:6px}
-    .toolbar{display:flex;align-items:center;gap:7px;flex:1}.tool-btn{height:34px;padding:0 12px;border:1px solid var(--line);background:#121f33;border-radius:8px;cursor:pointer;font-size:12px;display:flex;align-items:center;gap:7px;transition:.18s;text-decoration:none;color:var(--text)}.tool-btn:hover{border-color:rgba(77,215,208,.4);background:#162a42}.toolbar-spacer{flex:1}
-    .page-tabs{display:flex;padding:3px;gap:3px;border:1px solid var(--line);border-radius:10px;background:#0d1a2e}.page-tab{height:28px;padding:0 11px;display:flex;align-items:center;gap:6px;border-radius:7px;color:#7a8ea1;text-decoration:none;font-size:11px;font-weight:700}.page-tab:hover{color:var(--text);background:#162a42}.page-tab.active{color:#07111f;background:linear-gradient(135deg,#a8f3ec,#64d7cf)}
-    .main{height:calc(100% - var(--toolbar));overflow-y:auto;padding:20px}
-    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:24px}
-    .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;transition:.2s}
-    .card:hover{border-color:rgba(77,215,208,.3);box-shadow:0 4px 16px rgba(0,0,0,.2)}
-    .card-header{display:flex;align-items:center;gap:10px;margin-bottom:12px}
-    .card-icon{width:36px;height:36px;border-radius:8px;display:grid;place-items:center;font-size:18px}
-    .card-icon.air{background:rgba(255,107,122,.15);color:var(--air)}
-    .card-icon.rail{background:rgba(77,215,208,.15);color:var(--rail)}
-    .card-icon.city{background:rgba(91,120,245,.15);color:var(--city)}
-    .card-icon.trail{background:rgba(255,198,109,.15);color:var(--trail)}
-    .card-icon.full{background:rgba(139,163,255,.12);color:#8ba3ff}
-    .card-title{font-size:14px;font-weight:600}
-    .card-subtitle{font-size:10px;color:var(--muted);margin-top:2px}
-    .stat-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line)}
-    .stat-row:last-child{border-bottom:0}
-    .stat-label{font-size:11px;color:var(--muted)}
-    .stat-value{font-size:13px;font-weight:600}
-    .empty{padding:20px;text-align:center;color:var(--muted);font-size:12px}
-    .section-title{font-size:16px;font-weight:700;margin:24px 0 16px;display:flex;align-items:center;gap:8px}
-    .section-title::before{content:"";width:3px;height:16px;background:var(--accent);border-radius:2px}
-    @media(max-width:760px){.brand small,.brand-copy{display:none}.toolbar .tool-btn span{display:none}.tool-btn{padding:0 9px}.main{padding:12px}.grid{grid-template-columns:1fr}}
+    :root{--bg:#07111f;--panel:#0f1a2a;--line:rgba(148,184,218,.12);--muted:#6a7e92;--text:#e0e6ed;--accent:#4dd7d0;--toolbar:54px;--air:#ff6b7a;--rail:#4dd7d0;--city:#5b78f5;--trail:#ffc66d;--card-r:16px}
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif}
+    button{font:inherit;color:inherit;border:none;background:none;cursor:pointer}
+    a{color:inherit;text-decoration:none}
+
+    /* topbar */
+    .topbar{height:var(--toolbar);display:flex;align-items:center;padding:0 16px;border-bottom:1px solid var(--line);background:rgba(7,17,31,.97);gap:14px;position:sticky;top:0;z-index:100}
+    .brand{display:flex;align-items:center;gap:10px;min-width:160px}
+    .brand-mark{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:linear-gradient(135deg,#4dd7d0,#65a9ff);font-size:16px}
+    .brand strong{font-size:17px;font-weight:700}
+    .brand small{color:var(--muted);font-size:9px;letter-spacing:.12em;text-transform:uppercase;margin-left:6px}
+    .page-tabs{display:flex;padding:3px;gap:3px;border:1px solid var(--line);border-radius:10px;background:#0d1a2e}
+    .page-tab{height:28px;padding:0 11px;display:flex;align-items:center;gap:6px;border-radius:7px;color:#7a8ea1;font-size:11px;font-weight:700;transition:.15s}
+    .page-tab:hover{color:var(--text);background:#162a42}
+    .page-tab.active{color:#07111f;background:linear-gradient(135deg,#a8f3ec,#64d7cf)}
+    .toolbar-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+    .refresh-btn{height:32px;padding:0 14px;border:1px solid var(--line);border-radius:8px;background:#121f33;font-size:12px;display:flex;align-items:center;gap:6px;transition:.18s}
+    .refresh-btn:hover{border-color:rgba(77,215,208,.4);background:#162a42}
+
+    /* main scroll area */
+    .main{overflow-y:auto;height:calc(100vh - var(--toolbar));padding:24px 20px 60px}
+
+    /* section header with number */
+    .sec-head{display:flex;align-items:flex-end;gap:14px;margin:36px 0 18px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+    .sec-head:first-child{margin-top:0}
+    .sec-num{font-size:42px;font-weight:800;line-height:1;color:transparent;-webkit-text-stroke:1px rgba(77,215,208,.35);font-variant-numeric:tabular-nums}
+    .sec-label{display:flex;flex-direction:column;gap:2px}
+    .sec-label h2{font-size:18px;font-weight:700;line-height:1.2}
+    .sec-label span{font-size:11px;color:var(--muted);letter-spacing:.06em}
+
+    /* big stat card */
+    .stat-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:18px}
+    .big-stat{background:var(--panel);border:1px solid var(--line);border-radius:var(--card-r);padding:20px 18px 16px;display:flex;flex-direction:column;gap:4px;transition:.2s}
+    .big-stat:hover{border-color:rgba(77,215,208,.25);transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.25)}
+    .big-stat .num{font-size:36px;font-weight:800;line-height:1.1;font-variant-numeric:tabular-nums}
+    .big-stat .unit{font-size:13px;color:var(--muted);font-weight:400}
+    .big-stat .label{font-size:12px;color:var(--muted);margin-top:2px}
+    .big-stat.air .num{color:var(--air)}
+    .big-stat.rail .num{color:var(--rail)}
+    .big-stat.city .num{color:var(--city)}
+    .big-stat.trail .num{color:var(--trail)}
+
+    /* list card */
+    .list-card{background:var(--panel);border:1px solid var(--line);border-radius:var(--card-r);padding:18px;margin-bottom:14px}
+    .list-card-title{font-size:14px;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+    .list-card-title .dot{width:8px;height:8px;border-radius:50%}
+    .list-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--line)}
+    .list-row:last-child{border-bottom:none}
+    .list-row .left{font-size:13px;display:flex;align-items:center;gap:8px}
+    .list-row .right{font-size:12px;color:var(--muted);text-align:right}
+    .tag{display:inline-block;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:600}
+    .tag.air{background:rgba(255,107,122,.12);color:var(--air)}
+    .tag.rail{background:rgba(77,215,208,.12);color:var(--rail)}
+
+    /* level bar */
+    .level-bar-wrap{margin-bottom:10px}
+    .level-bar-label{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px}
+    .level-bar-label .lname{color:var(--muted)}
+    .level-bar-label .lcount{font-weight:600}
+    .level-bar{height:6px;border-radius:3px;background:rgba(148,184,218,.08);overflow:hidden}
+    .level-bar-fill{height:100%;border-radius:3px;transition:width .4s ease}
+
+    /* quick links */
+    .link-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+    .link-card{background:var(--panel);border:1px solid var(--line);border-radius:var(--card-r);padding:18px;display:flex;align-items:center;gap:14px;transition:.2s}
+    .link-card:hover{border-color:rgba(77,215,208,.3);transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.25)}
+    .link-icon{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;font-size:20px;flex-shrink:0}
+    .link-card .lt{font-size:14px;font-weight:600}
+    .link-card .ld{font-size:11px;color:var(--muted);margin-top:2px}
+
+    .empty-msg{padding:30px;text-align:center;color:var(--muted);font-size:13px}
+
+    @media(max-width:760px){
+      .brand small{display:none}
+      .main{padding:16px 12px 40px}
+      .stat-cards{grid-template-columns:repeat(2,1fr)}
+      .big-stat .num{font-size:28px}
+      .sec-num{font-size:32px}
+      .link-grid{grid-template-columns:1fr}
+      .page-tabs{display:none}
+    }
   </style>
 </head>
 <body>
   <header class="topbar">
-    <div class="brand"><span class="brand-mark">📊</span><span class="brand-copy"><strong>综合总览</strong><small>Summary</small></span></div>
-    <nav class="toolbar">
-      <div class="page-tabs">
-        <a class="page-tab" href="index.html">首页</a>
-        <a class="page-tab" href="TravelAtlas.html">行程</a>
-        <a class="page-tab" href="TravelAtlasCity.html">城市</a>
-        <a class="page-tab" href="Trail.html">足迹</a>
-        <a class="page-tab active" href="Summary.html">总览</a>
-      </div>
-      <button class="tool-btn" id="refreshBtn"><i>🔄</i><span>刷新</span></button>
-      <div class="toolbar-spacer"></div>
+    <div class="brand"><span class="brand-mark">📊</span><strong>综合总览</strong><small>Summary</small></div>
+    <nav class="page-tabs">
+      <a class="page-tab" href="index.html">首页</a>
+      <a class="page-tab" href="TravelAtlas.html">行程</a>
+      <a class="page-tab" href="TravelAtlasCity.html">城市</a>
+      <a class="page-tab" href="Trail.html">足迹</a>
+      <a class="page-tab active" href="Summary.html">总览</a>
     </nav>
+    <div class="toolbar-right">
+      <button class="refresh-btn" id="refreshBtn">🔄 刷新</button>
+    </div>
   </header>
+
   <div class="main">
-    <div class="section-title">行程数据</div>
-    <div class="grid" id="tripGrid"></div>
+    <!-- 壹 · 行程 -->
+    <div class="sec-head">
+      <div class="sec-num">01</div>
+      <div class="sec-label"><h2>行程数据</h2><span>航空与铁路出行记录</span></div>
+    </div>
+    <div class="stat-cards" id="tripBigStats"></div>
+    <div id="tripLists"></div>
 
-    <div class="section-title">城市探索</div>
-    <div class="grid" id="cityGrid"></div>
+    <!-- 贰 · 城市 -->
+    <div class="sec-head">
+      <div class="sec-num">02</div>
+      <div class="sec-label"><h2>城市探索</h2><span>到访城市与探索等级</span></div>
+    </div>
+    <div class="stat-cards" id="cityBigStats"></div>
+    <div id="cityLevels"></div>
 
-    <div class="section-title">足迹轨迹</div>
-    <div class="grid" id="trailGrid"></div>
+    <!-- 叁 · 足迹 -->
+    <div class="sec-head">
+      <div class="sec-num">03</div>
+      <div class="sec-label"><h2>足迹轨迹</h2><span>GPS 轨迹数据概览</span></div>
+    </div>
+    <div class="stat-cards" id="trailBigStats"></div>
 
-    <div class="section-title">快速链接</div>
-    <div class="grid">
-      <a class="card" href="TravelAtlas.html" style="text-decoration:none">
-        <div class="card-header">
-          <div class="card-icon air">️</div>
-          <div>
-            <div class="card-title">行程管理</div>
-            <div class="card-subtitle">添加和管理航线/铁路</div>
-          </div>
-        </div>
+    <!-- 肆 · 链接 -->
+    <div class="sec-head">
+      <div class="sec-num">04</div>
+      <div class="sec-label"><h2>快速链接</h2><span>跳转到各功能页面</span></div>
+    </div>
+    <div class="link-grid">
+      <a class="link-card" href="TravelAtlas.html">
+        <div class="link-icon" style="background:rgba(255,107,122,.12);color:var(--air)">✈️</div>
+        <div><div class="lt">行程管理</div><div class="ld">添加和管理航线 / 铁路</div></div>
       </a>
-      <a class="card" href="TravelAtlasCity.html" style="text-decoration:none">
-        <div class="card-header">
-          <div class="card-icon city">🏙️</div>
-          <div>
-            <div class="card-title">城市探索</div>
-            <div class="card-subtitle">标记到访城市</div>
-          </div>
-        </div>
+      <a class="link-card" href="TravelAtlasCity.html">
+        <div class="link-icon" style="background:rgba(91,120,245,.12);color:var(--city)">🏙️</div>
+        <div><div class="lt">城市探索</div><div class="ld">标记到访城市等级</div></div>
       </a>
-      <a class="card" href="Trail.html" style="text-decoration:none">
-        <div class="card-header">
-          <div class="card-icon trail">👣</div>
-          <div>
-            <div class="card-title">足迹轨迹</div>
-            <div class="card-subtitle">查看 GPS 轨迹</div>
-          </div>
-        </div>
+      <a class="link-card" href="Trail.html">
+        <div class="link-icon" style="background:rgba(255,198,109,.12);color:var(--trail)">👣</div>
+        <div><div class="lt">足迹轨迹</div><div class="ld">查看 GPS 轨迹记录</div></div>
+      </a>
+      <a class="link-card" href="index.html">
+        <div class="link-icon" style="background:rgba(77,215,208,.12);color:var(--accent)">🏠</div>
+        <div><div class="lt">返回首页</div><div class="ld">入口与导航</div></div>
       </a>
     </div>
   </div>
@@ -96,172 +158,122 @@
   (() => {
     'use strict';
     const $ = s => document.querySelector(s);
+    const levelNames = ['未到访','途经','停留','游览','住宿','居住'];
+    const levelColors = ['#4a5568','#65a9ff','#4dd7d0','#6dd4a0','#ffc66d','#ff6b7a'];
 
-    function loadTripData() {
-      try {
-        const data = localStorage.getItem('travelAtlasRows');
-        return data ? JSON.parse(data) : [];
-      } catch (e) { return [] }
+    function load(key, fallback) {
+      try { const d = localStorage.getItem(key); return d ? JSON.parse(d) : fallback; }
+      catch(e) { return fallback; }
     }
 
-    function loadCityData() {
-      try {
-        const data = localStorage.getItem('travel-atlas-city-exploration-v1');
-        return data ? JSON.parse(data) : {};
-      } catch (e) { return {} }
+    function haversine(a, b) {
+      const R = 6371, dLat = (b.lat - a.lat) * Math.PI / 180, dLon = (b.lon - a.lon) * Math.PI / 180;
+      const x = Math.sin(dLat/2)**2 + Math.cos(a.lat*Math.PI/180) * Math.cos(b.lat*Math.PI/180) * Math.sin(dLon/2)**2;
+      return 2 * R * Math.asin(Math.sqrt(x));
     }
 
-    function loadTrailData() {
-      try {
-        const data = localStorage.getItem('trailData');
-        return data ? JSON.parse(data) : [];
-      } catch (e) { return [] }
-    }
-
-    function renderTripStats(rows) {
-      const grid = $('#tripGrid');
+    function renderTrips(rows) {
+      const bigEl = $('#tripBigStats');
+      const listEl = $('#tripLists');
       if (!rows.length) {
-        grid.innerHTML = '<div class="card"><div class="empty">暂无行程数据</div></div>';
+        bigEl.innerHTML = '';
+        listEl.innerHTML = '<div class="list-card"><div class="empty-msg">暂无行程数据，去行程管理添加吧</div></div>';
         return;
       }
-      const air = rows.filter(r => r.mode === 'air').length;
-      const train = rows.filter(r => r.mode === 'train').length;
-      const total = rows.length;
-      const dates = rows.map(r => r.date).filter(Boolean);
-      const dateRange = dates.length ? `${dates[0]} ~ ${dates[dates.length - 1]}` : '—';
+      const air = rows.filter(r => r.mode === 'air');
+      const train = rows.filter(r => r.mode === 'train');
+      const dates = rows.map(r => r.date).filter(Boolean).sort();
 
-      grid.innerHTML = `
-        <div class="card">
-          <div class="card-header">
-            <div class="card-icon full">📈</div>
-            <div>
-              <div class="card-title">总览</div>
-              <div class="card-subtitle">行程统计</div>
-            </div>
+      bigEl.innerHTML = `
+        <div class="big-stat"><div class="num">${rows.length}<span class="unit"> 条</span></div><div class="label">总行程</div></div>
+        <div class="big-stat air"><div class="num">${air.length}<span class="unit"> 条</span></div><div class="label">航空出行</div></div>
+        <div class="big-stat rail"><div class="num">${train.length}<span class="unit"> 条</span></div><div class="label">铁路出行</div></div>
+        <div class="big-stat"><div class="num" style="font-size:20px;color:var(--text)">${dates.length ? dates[0] : '—'}<br>${dates.length ? dates[dates.length-1] : ''}</div><div class="label">时间跨度</div></div>
+      `;
+
+      const recent = type => rows.filter(r => r.mode === type).slice(-5).reverse();
+      function tripRows(list) {
+        return list.map(r => `
+          <div class="list-row">
+            <div class="left"><span class="tag ${r.mode}">${r.mode==='air'?'航空':'铁路'}</span> ${r.origin||'?'} → ${r.destination||'?'}</div>
+            <div class="right">${r.date||'—'} ${r.service||''}</div>
           </div>
-          <div class="stat-row"><span class="stat-label">总行程</span><span class="stat-value">${total} 条</span></div>
-          <div class="stat-row"><span class="stat-label">航空</span><span class="stat-value" style="color:var(--air)">${air} 条</span></div>
-          <div class="stat-row"><span class="stat-label">铁路</span><span class="stat-value" style="color:var(--rail)">${train} 条</span></div>
-          <div class="stat-row"><span class="stat-label">时间范围</span><span class="stat-value" style="font-size:11px">${dateRange}</span></div>
+        `).join('');
+      }
+
+      listEl.innerHTML = `
+        <div class="list-card">
+          <div class="list-card-title"><span class="dot" style="background:var(--air)"></span>最近航空</div>
+          ${tripRows(recent('air')) || '<div class="empty-msg">暂无航空数据</div>'}
         </div>
-        <div class="card">
-          <div class="card-header">
-            <div class="card-icon air">✈️</div>
-            <div>
-              <div class="card-title">最近航空</div>
-              <div class="card-subtitle">最新 5 条航班</div>
-            </div>
-          </div>
-          ${rows.filter(r => r.mode === 'air').slice(-5).reverse().map(r => `
-            <div class="stat-row">
-              <span class="stat-label">${r.date || '—'} ${r.service || ''}</span>
-              <span class="stat-value" style="font-size:11px">${r.origin || '?'} → ${r.destination || '?'}</span>
-            </div>
-          `).join('') || '<div class="empty">暂无航空数据</div>'}
-        </div>
-        <div class="card">
-          <div class="card-header">
-            <div class="card-icon rail">🚆</div>
-            <div>
-              <div class="card-title">最近铁路</div>
-              <div class="card-subtitle">最新 5 条火车</div>
-            </div>
-          </div>
-          ${rows.filter(r => r.mode === 'train').slice(-5).reverse().map(r => `
-            <div class="stat-row">
-              <span class="stat-label">${r.date || '—'} ${r.service || ''}</span>
-              <span class="stat-value" style="font-size:11px">${r.origin || '?'} → ${r.destination || '?'}</span>
-            </div>
-          `).join('') || '<div class="empty">暂无铁路数据</div>'}
+        <div class="list-card">
+          <div class="list-card-title"><span class="dot" style="background:var(--rail)"></span>最近铁路</div>
+          ${tripRows(recent('train')) || '<div class="empty-msg">暂无铁路数据</div>'}
         </div>
       `;
     }
 
-    function renderCityStats(levels) {
-      const grid = $('#cityGrid');
+    function renderCities(levels) {
+      const bigEl = $('#cityBigStats');
+      const listEl = $('#cityLevels');
       const codes = Object.keys(levels);
       if (!codes.length) {
-        grid.innerHTML = '<div class="card"><div class="empty">暂无城市探索数据</div></div>';
+        bigEl.innerHTML = '';
+        listEl.innerHTML = '<div class="list-card"><div class="empty-msg">暂无城市探索数据</div></div>';
         return;
       }
       const explored = codes.filter(c => levels[c] > 0).length;
-      const maxLevel = Math.max(...Object.values(levels));
-      const levelCounts = [0, 0, 0, 0, 0, 0];
-      codes.forEach(c => { if (levels[c] >= 0 && levels[c] <= 5) levelCounts[levels[c]]++ });
-      const levelNames = ['未到访', '途经', '停留', '游览', '住宿', '居住'];
+      const maxLv = Math.max(...Object.values(levels));
+      const counts = [0,0,0,0,0,0];
+      codes.forEach(c => { if (levels[c] >= 0 && levels[c] <= 5) counts[levels[c]]++ });
 
-      grid.innerHTML = `
-        <div class="card">
-          <div class="card-header">
-            <div class="card-icon city">🏙️</div>
-            <div>
-              <div class="card-title">城市探索</div>
-              <div class="card-subtitle">探索等级统计</div>
-            </div>
-          </div>
-          <div class="stat-row"><span class="stat-label">总城市</span><span class="stat-value">${codes.length} 个</span></div>
-          <div class="stat-row"><span class="stat-label">已探索</span><span class="stat-value" style="color:var(--city)">${explored} 个</span></div>
-          <div class="stat-row"><span class="stat-label">最高等级</span><span class="stat-value">${maxLevel} · ${levelNames[maxLevel]}</span></div>
-          <div class="stat-row"><span class="stat-label">探索率</span><span class="stat-value">${(explored / codes.length * 100).toFixed(1)}%</span></div>
-        </div>
-        <div class="card">
-          <div class="card-header">
-            <div class="card-icon full">📊</div>
-            <div>
-              <div class="card-title">等级分布</div>
-              <div class="card-subtitle">各等级城市数量</div>
-            </div>
-          </div>
-          ${levelCounts.map((count, i) => `
-            <div class="stat-row">
-              <span class="stat-label">${i} · ${levelNames[i]}</span>
-              <span class="stat-value">${count} 个</span>
+      bigEl.innerHTML = `
+        <div class="big-stat city"><div class="num">${explored}<span class="unit"> 个</span></div><div class="label">已探索城市</div></div>
+        <div class="big-stat"><div class="num">${codes.length}<span class="unit"> 个</span></div><div class="label">总城市数</div></div>
+        <div class="big-stat"><div class="num">${(explored/codes.length*100).toFixed(0)}<span class="unit">%</span></div><div class="label">探索率</div></div>
+        <div class="big-stat"><div class="num" style="color:${levelColors[maxLv]}">${maxLv}<span class="unit"> · ${levelNames[maxLv]}</span></div><div class="label">最高等级</div></div>
+      `;
+
+      const maxCount = Math.max(...counts.slice(1), 1);
+      listEl.innerHTML = `
+        <div class="list-card">
+          <div class="list-card-title"><span class="dot" style="background:var(--city)"></span>等级分布</div>
+          ${counts.map((c, i) => i === 0 ? '' : `
+            <div class="level-bar-wrap">
+              <div class="level-bar-label"><span class="lname">${i} · ${levelNames[i]}</span><span class="lcount">${c} 个</span></div>
+              <div class="level-bar"><div class="level-bar-fill" style="width:${c/maxCount*100}%;background:${levelColors[i]}"></div></div>
             </div>
           `).join('')}
         </div>
       `;
     }
 
-    function renderTrailStats(points) {
-      const grid = $('#trailGrid');
+    function renderTrail(points) {
+      const el = $('#trailBigStats');
       if (!points.length) {
-        grid.innerHTML = '<div class="card"><div class="empty">暂无足迹轨迹数据</div></div>';
+        el.innerHTML = '';
+        el.innerHTML = '<div class="list-card"><div class="empty-msg">暂无足迹轨迹数据</div></div>';
         return;
       }
-      const totalDist = points.reduce((s, p, i) => {
-        if (i === 0) return 0;
-        const prev = points[i - 1];
-        const R = 6371, dLat = (p.lat - prev.lat) * Math.PI / 180, dLon = (p.lon - prev.lon) * Math.PI / 180;
-        const a = Math.sin(dLat / 2) ** 2 + Math.cos(prev.lat * Math.PI / 180) * Math.cos(p.lat * Math.PI / 180) * Math.sin(dLon / 2) ** 2;
-        return s + 2 * R * Math.asin(Math.sqrt(a));
-      }, 0);
-      const days = Math.ceil((points[points.length - 1].time - points[0].time) / 86400);
-      const avgSpeed = points.reduce((s, p) => s + p.speed, 0) / points.length;
-      const startTime = new Date(points[0].time * 1000).toLocaleDateString('zh-CN');
-      const endTime = new Date(points[points.length - 1].time * 1000).toLocaleDateString('zh-CN');
+      let dist = 0;
+      for (let i = 1; i < points.length; i++) dist += haversine(points[i-1], points[i]);
+      const days = Math.max(1, Math.ceil((points[points.length-1].time - points[0].time) / 86400));
+      const avgSpd = points.reduce((s,p) => s + p.speed, 0) / points.length;
+      const start = new Date(points[0].time * 1000);
+      const end = new Date(points[points.length-1].time * 1000);
 
-      grid.innerHTML = `
-        <div class="card">
-          <div class="card-header">
-            <div class="card-icon trail">👣</div>
-            <div>
-              <div class="card-title">足迹轨迹</div>
-              <div class="card-subtitle">GPS 数据概览</div>
-            </div>
-          </div>
-          <div class="stat-row"><span class="stat-label">轨迹点</span><span class="stat-value">${points.length.toLocaleString()} 个</span></div>
-          <div class="stat-row"><span class="stat-label">总距离</span><span class="stat-value" style="color:var(--trail)">${totalDist.toFixed(0)} km</span></div>
-          <div class="stat-row"><span class="stat-label">时间跨度</span><span class="stat-value" style="font-size:11px">${days} 天</span></div>
-          <div class="stat-row"><span class="stat-label">平均速度</span><span class="stat-value">${avgSpeed.toFixed(2)} m/s</span></div>
-          <div class="stat-row"><span class="stat-label">记录时间</span><span class="stat-value" style="font-size:11px">${startTime} ~ ${endTime}</span></div>
-        </div>
+      el.innerHTML = `
+        <div class="big-stat trail"><div class="num">${dist >= 100 ? dist.toFixed(0) : dist.toFixed(1)}<span class="unit"> km</span></div><div class="label">总距离</div></div>
+        <div class="big-stat"><div class="num">${points.length.toLocaleString()}<span class="unit"> 个</span></div><div class="label">轨迹点</div></div>
+        <div class="big-stat"><div class="num">${days}<span class="unit"> 天</span></div><div class="label">时间跨度</div></div>
+        <div class="big-stat"><div class="num" style="font-size:20px;color:var(--text)">${start.toLocaleDateString('zh-CN')}<br>${end.toLocaleDateString('zh-CN')}</div><div class="label">记录区间</div></div>
       `;
     }
 
     function refresh() {
-      renderTripStats(loadTripData());
-      renderCityStats(loadCityData());
-      renderTrailStats(loadTrailData());
+      renderTrips(load('travelAtlasRows', []));
+      renderCities(load('travel-atlas-city-exploration-v1', {}));
+      renderTrail(load('trailData', []));
     }
 
     refresh();
