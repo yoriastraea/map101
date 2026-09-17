@@ -22,6 +22,8 @@
     .panel-head{min-height:68px;padding:12px 14px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}.panel-title{min-width:0;flex:1}.panel-title h2{font-size:13px;margin:0 0 3px}.panel-title p{font-size:10px;color:var(--muted);margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.icon-btn{width:30px;height:30px;display:grid;place-items:center}
     .import-zone{margin:12px;border:1px dashed #3b465a;border-radius:10px;padding:12px;background:#151c28;text-align:center;cursor:pointer;transition:.2s}.import-zone:hover,.import-zone.dragging{border-color:var(--accent);background:#192135}.import-zone strong{font-size:12px}.import-zone span{display:block;font-size:10px;color:var(--muted);margin-top:3px}
     .data-actions{display:flex;gap:6px;padding:0 12px 10px}.data-actions button{flex:1;height:30px;font-size:10px}.table-wrap{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;border-top:1px solid var(--line);background:#0f141d}.data-table{width:max-content;min-width:100%;border-collapse:separate;border-spacing:0;font-size:10px}.data-table th{height:30px;position:sticky;top:0;z-index:2;background:#1a2230;color:#9da8ba;text-align:left;font-weight:600;border-bottom:1px solid #313a4b;border-right:1px solid #242d3d;padding:0 7px;white-space:nowrap}.data-table td{height:30px;border-bottom:1px solid #1d2532;border-right:1px solid #1d2532;padding:0;background:#101620}.data-table tr:hover td{background:#141c29}.data-table input,.data-table select{height:29px;width:100%;min-width:82px;color:#dce2ec;background:transparent;border:0;outline:0;padding:0 7px;font-size:10px}.data-table select{min-width:62px}.data-table .row-num{width:32px;min-width:32px;text-align:center;color:#657085;background:#111722}.data-table .invalid td{box-shadow:inset 2px 0 0 var(--warn)}.delete-row{border:0;background:transparent;color:#6f7a8e;cursor:pointer;width:28px}.delete-row:hover{color:var(--air)}
+    .fetch-track{border:0;background:transparent;color:#6f7a8e;cursor:pointer;width:28px;font-size:14px}
+    .fetch-track:hover{color:var(--accent)}
     .statusbar{height:34px;flex:none;border-top:1px solid var(--line);padding:0 12px;display:flex;align-items:center;gap:8px;font-size:10px;color:var(--muted)}.status-dot{width:7px;height:7px;border-radius:50%;background:#62d99b}.status-dot.warn{background:var(--warn)}
     .canvas{position:relative;min-width:0;min-height:0;overflow:hidden;isolation:isolate;background:radial-gradient(circle at 50% 42%,#112a40 0,#07111f 48%,#02060b 100%)}.canvas::after{content:"";pointer-events:none;position:absolute;inset:0;box-shadow:inset 0 0 80px #04060999;z-index:2}.map{position:absolute;inset:0;overflow:hidden}.maplibregl-canvas{outline:none}.maplibregl-ctrl-bottom-right{z-index:4}.maplibregl-ctrl-group{overflow:hidden;background:rgba(7,21,37,.88);border:1px solid rgba(148,184,218,.2);border-radius:11px;box-shadow:0 12px 30px rgba(0,0,0,.3)}.maplibregl-ctrl-group button{filter:invert(1) brightness(1.8)}.maplibregl-popup-content{background:rgba(7,21,37,.96);color:#dcecff;border:1px solid rgba(148,184,218,.22);border-radius:12px;padding:12px 14px;box-shadow:0 14px 36px rgba(0,0,0,.34);font:11px Manrope,sans-serif}.maplibregl-popup-tip{border-top-color:rgba(7,21,37,.96)!important}.maplibregl-popup-close-button{color:#fff}.route-popup strong{display:block;margin-bottom:4px;color:#fff;font-size:13px}.route-popup span{color:#91a6bb;font-family:"DM Mono",monospace}
     .canvas-head{position:absolute;top:16px;left:16px;right:16px;z-index:5;display:flex;justify-content:space-between;pointer-events:none}.canvas-label{padding:10px 12px;border:1px solid #30394a;border-radius:10px;background:#101620d9;backdrop-filter:blur(10px);box-shadow:0 8px 28px #0005}.canvas-label small{display:block;color:var(--muted);font-size:8px;letter-spacing:.16em}.canvas-label strong{font-family:Newsreader,serif;font-size:18px}.mode-switch{pointer-events:auto;display:flex;padding:4px;gap:3px;border:1px solid #30394a;border-radius:10px;background:#101620e8;backdrop-filter:blur(10px)}.seg-btn{border:0;background:transparent;height:29px;padding:0 10px;font-size:10px;color:#788499}.seg-btn.active{background:#2a3345;color:#fff}.seg-btn[data-mode=air].active{box-shadow:inset 0 -2px 0 var(--air)}.seg-btn[data-mode=train].active{box-shadow:inset 0 -2px 0 var(--rail)}
@@ -87,14 +89,14 @@
     <aside class="data-panel">
       <div class="panel-head"><div class="panel-title"><h2>行程数据</h2><p>上传文件将覆盖当前表格 · 修改后实时重绘</p></div></div>
       <div class="import-zone" id="dropZone"><input id="fileInput" type="file" accept=".xlsx,.xls,.csv" multiple hidden><strong><i class="bi bi-file-earmark-spreadsheet"></i> 拖入或选择 Excel / CSV</strong><span>兼容飞机乘坐记录、火车乘坐记录和统一模板</span></div>
-      <div class="data-actions"><button class="tool-btn" id="loadCurrentBtn">载入现有连线</button><button class="tool-btn" id="clearBtn">清空表格</button></div>
+      <div class="data-actions"><button class="tool-btn" id="loadCurrentBtn">载入现有连线</button><button class="tool-btn" id="clearBtn">清空表格</button><button class="tool-btn hidden" id="clearTracksBtn">清除航路缓存</button></div>
       <div class="table-wrap"><table class="data-table"><thead><tr><th>#</th><th>类型</th><th>日期</th><th>出发</th><th>到达</th><th>航班/车次</th><th>时长 min</th><th>里程 km</th><th></th></tr></thead><tbody id="dataBody"></tbody></table></div>
       <div class="statusbar"><span class="status-dot" id="statusDot"></span><span id="statusText">正在准备基础数据…</span></div>
     </aside>
 
     <main class="canvas">
       <div id="map" class="map"></div>
-      <div class="canvas-head"><div class="canvas-label"><small>CURRENT VIEW</small><strong>球面交通地图</strong></div><div class="mode-switch"><button class="seg-btn active" data-mode="all">全部</button><button class="seg-btn active" data-mode="air">航空</button><button class="seg-btn active" data-mode="train">铁路</button></div></div>
+      <div class="canvas-head"><div class="canvas-label"><small>CURRENT VIEW</small><strong>球面交通地图</strong></div><div class="mode-switch"><button class="seg-btn active" data-mode="straight">直线航线</button><button class="seg-btn" data-mode="track">真实航路</button><button class="seg-btn active" data-mode="train">铁路</button></div></div>
       <div class="legend"><span><i class="air"></i>航空</span><span><i class="rail"></i>铁路</span></div>
       <div class="map-style-switch" aria-label="地图风格"><span>底图</span><button class="active" data-map-style="atlas">Atlas</button><button data-map-style="studio">Studio</button></div>
     </main>
@@ -188,7 +190,7 @@
   (() => {
     'use strict';
     const COLORS={air:'#ff6b7a',train:'#4ade80'};
-    const state={rows:[], airport:new Map(), airportName:new Map(), station:new Map(), foreign:new Map(), ready:false, userLoaded:false, scope:'combined', visible:{air:true,train:true}, map:null, mapStyle:'atlas', handlersBound:false, features:[], timer:null, referencePromise:null, currentDataPromise:null};
+    const state={rows:[], airport:new Map(), airportName:new Map(), station:new Map(), foreign:new Map(), ready:false, userLoaded:false, scope:'combined', visible:{straight:true,track:false,train:true}, map:null, mapStyle:'atlas', handlersBound:false, features:[], timer:null, referencePromise:null, currentDataPromise:null, flightRoutes:[], railRoutesData:null, railRouteLookup:new Map()};
     const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
     const clean=v=>v==null?'':String(v).trim();
     const num=v=>{if(v==null||clean(v)==='')return null;const n=Number(v);return Number.isFinite(n)?n:null};
@@ -211,6 +213,24 @@
         rail.forEach(r=>{const name=clean(r['车站']),lon=num(r['经度']),lat=num(r['纬度']);if(name&&lon!=null&&lat!=null)state.station.set(name,{name,lon,lat,city:clean(r['市']),province:clean(r['省'])})});
         state.ready=true;setStatus(`基础库已就绪 · ${state.airport.size} 个机场 · ${state.station.size} 个车站`);
       }catch(e){setStatus('基础数据读取失败；可在表格中提供经纬度',true)}
+    }
+    async function loadRailRoutes(){
+      try{
+        const resp=await fetch('data/rail_routes_real_simple.geojson');
+        if(!resp.ok)return;
+        const geojson=await resp.json();
+        state.railRoutesData=geojson;
+        state.railRouteLookup.clear();
+        for(const feature of geojson.features){
+          const p=feature.properties;
+          const from=clean(p.from),to=clean(p.to);
+          if(from&&to&&feature.geometry){
+            const key=`${from}→${to}`;
+            state.railRouteLookup.set(key,feature.geometry.coordinates);
+          }
+        }
+        console.log(`铁路真实路由已加载: ${state.railRouteLookup.size} 条`);
+      }catch(e){console.warn('铁路真实路由加载失败:',e)}
     }
     function setStatus(text,warn=false){$('#statusText').textContent=text;$('#statusDot').classList.toggle('warn',warn)}
 
@@ -250,7 +270,26 @@
       return segs.filter(s=>s.length>1);
     }
     function buildFeatures(){
-      const routes=[],points=[],invalid=[];state.rows.forEach((row,i)=>{const a=position(row,'origin'),b=position(row,'destination');if(!a||!b){invalid.push(i);return}const coordinates=splitDateLine(greatCircle(a,b));routes.push({type:'Feature',properties:{id:row.id,mode:row.mode,origin:row.originLabel||row.origin,destination:row.destinationLabel||row.destination,service:row.service},geometry:{type:'MultiLineString',coordinates}});for(const [p,endpoint] of [[a,'origin'],[b,'destination']])points.push({type:'Feature',properties:{mode:row.mode,name:p.name||row[endpoint],endpoint},geometry:{type:'Point',coordinates:[p.lon,p.lat]}});if(row.distance==null)row._distance=haversine(a,b);else row._distance=row.distance});state.features=routes;return {routes:{type:'FeatureCollection',features:routes},points:{type:'FeatureCollection',features:points},invalid}}
+      const routes=[],points=[],invalid=[];state.rows.forEach((row,i)=>{const a=position(row,'origin'),b=position(row,'destination');if(!a||!b){invalid.push(i);return}
+      // 铁路模式：优先使用真实铁路路由
+      let coordinates;
+      if(row.mode==='train'&&state.railRouteLookup.size>0){
+        const fromName=clean(row.originLabel||row.origin);
+        const toName=clean(row.destinationLabel||row.destination);
+        const key=`${fromName}→${toName}`;
+        const realCoords=state.railRouteLookup.get(key);
+        if(realCoords){
+          coordinates=splitDateLine(realCoords);
+        }else{
+          coordinates=splitDateLine([[a.lon,a.lat],[b.lon,b.lat]]);
+        }
+      }else{
+        // 航空模式：直线连线
+        coordinates=splitDateLine([[a.lon,a.lat],[b.lon,b.lat]]);
+      }
+      routes.push({type:'Feature',properties:{id:row.id,mode:row.mode,origin:row.originLabel||row.origin,destination:row.destinationLabel||row.destination,service:row.service},geometry:{type:'MultiLineString',coordinates}});
+      for(const [p,endpoint] of [[a,'origin'],[b,'destination']])points.push({type:'Feature',properties:{mode:row.mode,name:p.name||row[endpoint],endpoint},geometry:{type:'Point',coordinates:[p.lon,p.lat]}});
+      if(row.distance==null)row._distance=haversine(a,b);else row._distance=row.distance});state.features=routes;return {routes:{type:'FeatureCollection',features:routes},points:{type:'FeatureCollection',features:points},invalid}}
 
     function darkenBaseMap(){
       for(const layer of state.map.getStyle().layers||[]){
@@ -266,25 +305,36 @@
       const map=state.map;
       map.addSource('routes',{type:'geojson',data:{type:'FeatureCollection',features:[]}});
       map.addSource('points',{type:'geojson',data:{type:'FeatureCollection',features:[]}});
-      for(const mode of ['air','train']){
-        const filter=['==',['get','mode'],mode];
-        const atlas=state.mapStyle==='atlas';
-        map.addLayer({id:mode+'-glow',type:'line',source:'routes',filter,paint:{'line-color':COLORS[mode],'line-width':mode==='air'?5:4,'line-opacity':atlas?.12:.2,'line-blur':3}});
-        map.addLayer({id:mode+'-routes',type:'line',source:'routes',filter,layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':COLORS[mode],'line-width':mode==='air'?1.8:1.5,'line-opacity':atlas?.62:.86}});
-        map.addLayer({id:mode+'-points',type:'circle',source:'points',filter,paint:{'circle-radius':['interpolate',['linear'],['zoom'],0,2,5,5],'circle-color':COLORS[mode],'circle-stroke-color':atlas?'#07111f':'#0c1017','circle-stroke-width':1,'circle-opacity':.88}});
-      }
-      map.addLayer({id:'air-direction',type:'symbol',source:'routes',filter:['==',['get','mode'],'air'],layout:{'symbol-placement':'line','symbol-spacing':150,'text-field':'›','text-size':16,'text-rotation-alignment':'map','text-keep-upright':false},paint:{'text-color':'#ffd3d8','text-opacity':.72,'text-halo-color':'#8c2838','text-halo-width':.5}});
+      map.addSource('flightTracks',{type:'geojson',data:{type:'FeatureCollection',features:[]}});
+      
+      // 直线航线
+      map.addLayer({id:'straight-glow',type:'line',source:'routes',filter:['==',['get','mode'],'air'],paint:{'line-color':COLORS.air,'line-width':5,'line-opacity':.12,'line-blur':3}});
+      map.addLayer({id:'straight-routes',type:'line',source:'routes',filter:['==',['get','mode'],'air'],layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':COLORS.air,'line-width':1.8,'line-opacity':.62}});
+      map.addLayer({id:'straight-direction',type:'symbol',source:'routes',filter:['==',['get','mode'],'air'],layout:{'symbol-placement':'line','symbol-spacing':150,'text-field':'›','text-size':16,'text-rotation-alignment':'map','text-keep-upright':false},paint:{'text-color':'#ffd3d8','text-opacity':.72,'text-halo-color':'#8c2838','text-halo-width':.5}});
+      
+      // 铁路
+      map.addLayer({id:'train-glow',type:'line',source:'routes',filter:['==',['get','mode'],'train'],paint:{'line-color':COLORS.train,'line-width':4,'line-opacity':.12,'line-blur':3}});
+      map.addLayer({id:'train-routes',type:'line',source:'routes',filter:['==',['get','mode'],'train'],layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':COLORS.train,'line-width':1.5,'line-opacity':.86}});
+      
+      // 真实航路
+      map.addLayer({id:'track-glow',type:'line',source:'flightTracks',paint:{'line-color':'#4ade80','line-width':6,'line-opacity':.15,'line-blur':4}});
+      map.addLayer({id:'track-routes',type:'line',source:'flightTracks',layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':'#4ade80','line-width':2,'line-opacity':.85}});
+      
+      // 机场点
+      map.addLayer({id:'air-points',type:'circle',source:'points',filter:['==',['get','mode'],'air'],paint:{'circle-radius':['interpolate',['linear'],['zoom'],0,2,5,5],'circle-color':COLORS.air,'circle-stroke-color':'#07111f','circle-stroke-width':1,'circle-opacity':.88}});
+      map.addLayer({id:'train-points',type:'circle',source:'points',filter:['==',['get','mode'],'train'],paint:{'circle-radius':['interpolate',['linear'],['zoom'],0,2,5,5],'circle-color':COLORS.train,'circle-stroke-color':'#07111f','circle-stroke-width':1,'circle-opacity':.88}});
     }
     function bindMapHandlers(){
       if(state.handlersBound)return;state.handlersBound=true;
-      for(const mode of ['air','train']){
-        state.map.on('click',mode+'-routes',e=>{const p=e.features[0].properties;new maplibregl.Popup({closeButton:false,maxWidth:'260px'}).setLngLat(e.lngLat).setHTML(`<div class="route-popup"><strong>${esc(p.origin)} → ${esc(p.destination)}</strong><span>${esc(p.service||mode)}</span></div>`).addTo(state.map)});
-        state.map.on('mouseenter',mode+'-routes',()=>state.map.getCanvas().style.cursor='pointer');
-        state.map.on('mouseleave',mode+'-routes',()=>state.map.getCanvas().style.cursor='');
+      for(const layerId of ['straight-routes','train-routes','track-routes']){
+        state.map.on('click',layerId,e=>{const p=e.features[0].properties;new maplibregl.Popup({closeButton:false,maxWidth:'260px'}).setLngLat(e.lngLat).setHTML(`<div class="route-popup"><strong>${esc(p.origin||'')} → ${esc(p.destination||'')}</strong><span>${esc(p.service||'')}</span></div>`).addTo(state.map)});
+        state.map.on('mouseenter',layerId,()=>state.map.getCanvas().style.cursor='pointer');
+        state.map.on('mouseleave',layerId,()=>state.map.getCanvas().style.cursor='');
       }
     }
     function prepareMapStyle(){
       state.map.setProjection({type:'mercator'});
+      state.map.setMaxPitch(0); // 禁止3D倾斜
       if(state.mapStyle==='atlas')darkenBaseMap();
       addTravelLayers();
       bindMapHandlers();
@@ -292,8 +342,8 @@
     }
     function initMap(){
       if(!window.maplibregl){setStatus('地图组件加载失败，请检查网络',true);return}
-      const map=state.map=new maplibregl.Map({container:'map',style:'https://demotiles.maplibre.org/style.json',center:[128,28],zoom:1.35,pitch:0,bearing:0,canvasContextAttributes:{antialias:true},attributionControl:true});
-      map.addControl(new maplibregl.NavigationControl({visualizePitch:true}),'bottom-right');
+      const map=state.map=new maplibregl.Map({container:'map',style:'https://demotiles.maplibre.org/style.json',center:[128,28],zoom:1.35,pitch:0,bearing:0,maxPitch:0,canvasContextAttributes:{antialias:true},attributionControl:true});
+      map.addControl(new maplibregl.NavigationControl({visualizePitch:false}),'bottom-right');
       map.on('style.load',prepareMapStyle);
       map.on('error',e=>{if(e&&e.error)setStatus('地图加载提示：'+e.error.message,true)});
     }
@@ -310,12 +360,54 @@
       coords.forEach(c=>bounds.extend(c));
       state.map.fitBounds(bounds,{padding:70,maxZoom:5,duration:700});
     }
-    function updateMap(fit=false){if(!state.map||!state.map.getSource('routes')||!state.map.getSource('points'))return;const data=buildFeatures();state.map.getSource('routes').setData(data.routes);state.map.getSource('points').setData(data.points);for(const mode of ['air','train']){for(const suffix of ['glow','routes','points'])state.map.setLayoutProperty(`${mode}-${suffix}`,'visibility',state.visible[mode]?'visible':'none');if(mode==='air'&&state.map.getLayer('air-direction'))state.map.setLayoutProperty('air-direction','visibility',state.visible.air?'visible':'none')}if(fit)fitDataView(data.points);markInvalid(data.invalid);setStatus(`${state.rows.length} 条数据 · ${data.routes.features.length} 条已绘制${data.invalid.length?` · ${data.invalid.length} 条未匹配`:''}`,!!data.invalid.length)}
+    function updateMap(fit=false){
+      if(!state.map||!state.map.getSource('routes')||!state.map.getSource('points')||!state.map.getSource('flightTracks'))return;
+      const data=buildFeatures();
+      state.map.getSource('routes').setData(data.routes);
+      state.map.getSource('points').setData(data.points);
+      
+      // 直线航线可见性
+      const straightVis=state.visible.straight&&!state.visible.track;
+      for(const suffix of ['glow','routes','direction']){
+        if(state.map.getLayer('straight-'+suffix))state.map.setLayoutProperty('straight-'+suffix,'visibility',straightVis?'visible':'none');
+      }
+      
+      // 铁路可见性
+      for(const suffix of ['glow','routes']){
+        if(state.map.getLayer('train-'+suffix))state.map.setLayoutProperty('train-'+suffix,'visibility',state.visible.train?'visible':'none');
+      }
+      if(state.map.getLayer('train-points'))state.map.setLayoutProperty('train-points','visibility',state.visible.train?'visible':'none');
+      
+      // 真实航路可见性
+      for(const suffix of ['glow','routes']){
+        if(state.map.getLayer('track-'+suffix))state.map.setLayoutProperty('track-'+suffix,'visibility',state.visible.track?'visible':'none');
+      }
+      
+      // 机场点始终可见（只要有航线数据）
+      if(state.map.getLayer('air-points'))state.map.setLayoutProperty('air-points','visibility','visible');
+      
+      // 更新真实航路数据
+      updateFlightTracksLayer();
+      
+      if(fit)fitDataView(data.points);
+      markInvalid(data.invalid);
+      setStatus(`${state.rows.length} 条数据 · ${data.routes.features.length} 条已绘制${data.invalid.length?` · ${data.invalid.length} 条未匹配`:''}`,!!data.invalid.length)
+    }
     function markInvalid(indices){const set=new Set(indices);$$('#dataBody tr').forEach((tr,i)=>{tr.classList.toggle('invalid',set.has(i));tr.title=set.has(i)?'未找到出发地或到达地坐标；请检查机场 IATA、车站名称或经纬度':''})}
 
     function renderTable(){
-      $('#dataBody').innerHTML=state.rows.map((r,i)=>`<tr data-id="${r.id}"><td class="row-num">${i+1}</td><td><select data-key="mode"><option value="air" ${r.mode==='air'?'selected':''}>航空</option><option value="train" ${r.mode==='train'?'selected':''}>铁路</option></select></td>${cell('date',r.date,'110px')}${cell('origin',r.origin,'105px')}${cell('destination',r.destination,'105px')}${cell('service',r.service,'92px')}${cell('duration',r.duration??'','76px','number')}${cell('distance',r.distance??'','76px','number')}<td><button class="delete-row" title="删除"><i class="bi bi-x-lg"></i></button></td></tr>`).join('');
-      $$('#dataBody input,#dataBody select').forEach(el=>el.addEventListener('change',editRow));$$('.delete-row').forEach(el=>el.addEventListener('click',e=>{const id=e.currentTarget.closest('tr').dataset.id;state.rows=state.rows.filter(r=>r.id!==id);saveToStorage();renderAll()}));
+      const showTrackBtn=state.visible.track;
+      $('#dataBody').innerHTML=state.rows.map((r,i)=>{
+        const trackBtn=showTrackBtn&&r.mode==='air'?`<td><button class="fetch-track" data-id="${r.id}" title="获取真实航路"><i class="bi bi-cloud-download"></i></button></td>`:'';
+        return `<tr data-id="${r.id}"><td class="row-num">${i+1}</td><td><select data-key="mode"><option value="air" ${r.mode==='air'?'selected':''}>航空</option><option value="train" ${r.mode==='train'?'selected':''}>铁路</option></select></td>${cell('date',r.date,'110px')}${cell('origin',r.origin,'105px')}${cell('destination',r.destination,'105px')}${cell('service',r.service,'92px')}${cell('duration',r.duration??'','76px','number')}${cell('distance',r.distance??'','76px','number')}${trackBtn}<td><button class="delete-row" title="删除"><i class="bi bi-x-lg"></i></button></td></tr>`
+      }).join('');
+      $$('#dataBody input,#dataBody select').forEach(el=>el.addEventListener('change',editRow));
+      $$('.delete-row').forEach(el=>el.addEventListener('click',e=>{const id=e.currentTarget.closest('tr').dataset.id;state.rows=state.rows.filter(r=>r.id!==id);saveToStorage();renderAll()}));
+      $$('.fetch-track').forEach(el=>el.addEventListener('click',e=>{
+        const id=e.currentTarget.dataset.id;
+        const row=state.rows.find(r=>r.id===id);
+        if(row)fetchAndCacheTrack(row);
+      }));
     }
     function cell(key,value,width,type='text'){return `<td><input data-key="${key}" type="${type}" value="${esc(value)}" style="min-width:${width}"></td>`}
     function editRow(e){const tr=e.target.closest('tr'),row=state.rows.find(r=>r.id===tr.dataset.id),key=e.target.dataset.key;row[key]=['duration','distance'].includes(key)?num(e.target.value):clean(e.target.value);if(key==='origin')row.originLabel=row.origin;if(key==='destination')row.destinationLabel=row.destination;saveToStorage();scheduleRender()}
@@ -350,7 +442,107 @@
       try{
         await state.referencePromise;
         const all=[],foreign=[],uploadedAirports=[];
+        const tracks=[]; // 人生点点轨迹数据
+        
         for(const file of files){
+          const fileName=file.name.toLowerCase();
+          
+          // 检测是否为人生点点CSV格式
+          if(fileName.endsWith('.csv')){
+            const text=await file.text();
+            const lines=text.split(/\r?\n/).filter(Boolean);
+            if(lines.length>0){
+              const headers=lines[0].split(',').map(h=>h.trim().toLowerCase());
+              // 人生点点CSV格式: timestamp,longitude,latitude,heading,accuracy,verticalAccuracy,speed,distance,altitude,course,param1,param2,param3
+              if(headers.includes('timestamp')&&headers.includes('longitude')&&headers.includes('latitude')){
+                // 解析人生点点数据
+                const points=[];
+                for(let i=1;i<lines.length;i++){
+                  const cols=lines[i].split(',');
+                  if(cols.length>=3){
+                    const timestamp=cols[0];
+                    const lon=parseFloat(cols[1]);
+                    const lat=parseFloat(cols[2]);
+                    if(!isNaN(lon)&&!isNaN(lat)){
+                      points.push({timestamp,lon,lat});
+                    }
+                  }
+                }
+                if(points.length>=2){
+                  // 按时间排序
+                  points.sort((a,b)=>a.timestamp.localeCompare(b.timestamp));
+                  
+                  // 将轨迹点分组为行程段（根据时间间隔，超过2小时视为新行程）
+                  const segments=[];
+                  let currentSegment=[points[0]];
+                  
+                  for(let i=1;i<points.length;i++){
+                    const prevTime=new Date(points[i-1].timestamp).getTime();
+                    const currTime=new Date(points[i].timestamp).getTime();
+                    const gap=currTime-prevTime;
+                    
+                    if(gap>2*60*60*1000||gap<0){ // 2小时间隔或时间倒退
+                      if(currentSegment.length>=2)segments.push(currentSegment);
+                      currentSegment=[points[i]];
+                    }else{
+                      currentSegment.push(points[i]);
+                    }
+                  }
+                  if(currentSegment.length>=2)segments.push(currentSegment);
+                  
+                  // 处理每个行程段
+                  for(const segment of segments){
+                    const first=segment[0];
+                    const last=segment[segment.length-1];
+                    const coords=segment.map(p=>[p.lon,p.lat]);
+                    
+                    // 尝试反向查找机场代码
+                    let originCode='',destCode='';
+                    for(const[code,info]of state.airport){
+                      if(Math.abs(info.lon-first.lon)<0.01&&Math.abs(info.lat-first.lat)<0.01){
+                        originCode=code;
+                      }
+                      if(Math.abs(info.lon-last.lon)<0.01&&Math.abs(info.lat-last.lat)<0.01){
+                        destCode=code;
+                      }
+                    }
+                    
+                    // 创建行程记录
+                    const row={
+                      id:uid(),
+                      mode:'air', // 默认航空，后续可改进判断逻辑
+                      date:first.timestamp.split('T')[0]||'',
+                      origin:originCode||`${first.lat.toFixed(3)},${first.lon.toFixed(3)}`,
+                      destination:destCode||`${last.lat.toFixed(3)},${last.lon.toFixed(3)}`,
+                      originLabel:originCode||'起点',
+                      destinationLabel:destCode||'终点',
+                      service:'',
+                      duration:null,
+                      distance:null,
+                      originLon:first.lon,
+                      originLat:first.lat,
+                      destinationLon:last.lon,
+                      destinationLat:last.lat
+                    };
+                    all.push(row);
+                    
+                    // 保存轨迹数据用于真实航路显示
+                    tracks.push({
+                      id:row.id,
+                      service:'',
+                      date:row.date,
+                      origin:row.origin,
+                      destination:row.destination,
+                      coordinates:coords
+                    });
+                  }
+                }
+                continue;
+              }
+            }
+          }
+          
+          // 原有的Excel/CSV解析逻辑
           const wb=XLSX.read(await file.arrayBuffer(),{type:'array',cellDates:true});
           for(const name of wb.SheetNames){
             const raw=XLSX.utils.sheet_to_json(wb.Sheets[name],{defval:'',raw:false}).map(tidyRow);
@@ -371,21 +563,118 @@
         foreign.forEach(([k,v])=>state.foreign.set(k,v));
         uploadedAirports.forEach(([k,v])=>state.airport.set(k,v));
         if(!all.length)throw Error('未识别到行程列');
+        
+        // 合并轨迹数据
+        if(tracks.length>0){
+          state.flightRoutes.push(...tracks);
+        }
+        
         state.rows=all;saveToStorage();renderAll(true);
         const matched=buildFeatures().routes.features.length;
-        toast(`导入 ${all.length} 条，成功绘制 ${matched} 条`);
-      }catch(e){setStatus('导入失败：'+e.message,true);toast('导入失败，请检查表头')}
+        toast(`导入 ${all.length} 条，成功绘制 ${matched} 条${tracks.length?`，${tracks.length} 条轨迹`:''}`);
+      }catch(e){setStatus('导入失败：'+e.message,true);toast('导入失败，请检查文件格式')}
     }
     function download(name,text,type='text/csv;charset=utf-8'){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+text],{type}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500)}
     function exportCSV(template=false){const head=['类型','日期','出发','到达','航班/车次','时长(分钟)','里程(km)','出发经度','出发纬度','到达经度','到达纬度'],rows=template?[['航空','2026-01-01','LHR','JFK','BA0175','','','','','',''],['航空','2026-01-02','广州白云','上海虹桥','CZ3539','','','','','',''],['铁路','2026-01-03','上海虹桥','杭州东','G7333','','','','','','']]:state.rows.map(r=>[r.mode==='air'?'航空':'铁路',r.date,r.origin,r.destination,r.service,r.duration??'',r.distance??'',r.originLon??'',r.originLat??'',r.destinationLon??'',r.destinationLat??'']);download(template?'TravelAtlas_导入模板.csv':'TravelAtlas_行程数据.csv',[head,...rows].map(row=>row.map(v=>'"'+clean(v).replace(/"/g,'""')+'"').join(',')).join('\r\n'))}
 
-    function saveToStorage(){try{localStorage.setItem('travelAtlasRows',JSON.stringify(state.rows))}catch(e){}}
-    function loadFromStorage(){try{const d=localStorage.getItem('travelAtlasRows');if(d){state.rows=JSON.parse(d);return true}}catch(e){}return false}
+    function saveToStorage(){try{localStorage.setItem('travelAtlasRows',JSON.stringify(state.rows));localStorage.setItem('travelAtlasFlightRoutes',JSON.stringify(state.flightRoutes))}catch(e){}}
+    function loadFromStorage(){try{const d=localStorage.getItem('travelAtlasRows');if(d){state.rows=JSON.parse(d)}const r=localStorage.getItem('travelAtlasFlightRoutes');if(r){state.flightRoutes=JSON.parse(r)}return!!d}catch(e){}return false}
+    
+    // 航路管理接口
+    async function fetchFlightTrack(row){
+      // TODO: 实现真实API调用
+      // 参数: row.date, row.service (航班号), row.origin, row.destination
+      // 返回: {coordinates: [[lon,lat],...], success: true} 或 {error: 'message', success: false}
+      // 注意: 如果没有真实航路数据，必须返回失败，禁止使用大圆或弧形
+      return new Promise((resolve)=>{
+        setTimeout(()=>{
+          // 模拟失败响应 - 实际应调用后端API获取真实航路
+          resolve({success:false,error:'真实航路API尚未实现，当前仅支持直线航线'});
+        },500);
+      });
+    }
+    
+    async function fetchAndCacheTrack(row){
+      const existing=state.flightRoutes.find(r=>r.id===row.id);
+      if(existing){
+        toast('该航路已缓存');
+        return;
+      }
+      toast('正在获取航路...');
+      const result=await fetchFlightTrack(row);
+      if(!result.success){
+        toast('获取失败: '+result.error);
+        return;
+      }
+      state.flightRoutes.push({
+        id:row.id,
+        service:row.service,
+        date:row.date,
+        origin:row.origin,
+        destination:row.destination,
+        coordinates:result.coordinates
+      });
+      saveToStorage();
+      updateMap();
+      toast('航路已获取并缓存');
+    }
+    
+    function clearFlightRoutes(){
+      if(!confirm('确定清除所有已缓存的真实航路数据？'))return;
+      state.flightRoutes=[];
+      saveToStorage();
+      updateMap();
+      toast('已清除所有航路缓存');
+    }
+    
+    function updateFlightTracksLayer(){
+      if(!state.map||!state.map.getSource('flightTracks'))return;
+      const features=state.flightRoutes.map(route=>({
+        type:'Feature',
+        properties:{
+          id:route.id,
+          service:route.service,
+          origin:route.origin,
+          destination:route.destination
+        },
+        geometry:{
+          type:'MultiLineString',
+          coordinates:splitDateLine(route.coordinates)
+        }
+      }));
+      state.map.getSource('flightTracks').setData({type:'FeatureCollection',features});
+    }
 
-    const fileInput=$('#fileInput');$('#uploadBtn').onclick=()=>fileInput.click();$('#dropZone').onclick=e=>{if(e.target!==fileInput)fileInput.click()};fileInput.onchange=e=>{const files=[...e.target.files];e.target.value='';importFiles(files)};$('#addBtn').onclick=()=>{$('#manualAddModal').classList.add('show');$('#maOrigin').focus()};$('#clearBtn').onclick=()=>{state.userLoaded=true;state.rows=[];saveToStorage();renderAll();toast('表格已清空')};$('#fitBtn').onclick=()=>updateMap(true);$('#exportBtn').onclick=()=>exportCSV(false);$('#templateBtn').onclick=()=>exportCSV(true);$('#loadCurrentBtn').onclick=()=>{state.userLoaded=false;loadCurrent()};
+    const fileInput=$('#fileInput');$('#uploadBtn').onclick=()=>fileInput.click();$('#dropZone').onclick=e=>{if(e.target!==fileInput)fileInput.click()};fileInput.onchange=e=>{const files=[...e.target.files];e.target.value='';importFiles(files)};$('#addBtn').onclick=()=>{$('#manualAddModal').classList.add('show');$('#maOrigin').focus()};$('#clearBtn').onclick=()=>{state.userLoaded=true;state.rows=[];saveToStorage();renderAll();toast('表格已清空')};$('#clearTracksBtn').onclick=clearFlightRoutes;$('#fitBtn').onclick=()=>updateMap(true);$('#exportBtn').onclick=()=>exportCSV(false);$('#templateBtn').onclick=()=>exportCSV(true);$('#loadCurrentBtn').onclick=()=>{state.userLoaded=false;loadCurrent()};
     const zone=$('#dropZone');['dragenter','dragover'].forEach(n=>zone.addEventListener(n,e=>{e.preventDefault();zone.classList.add('dragging')}));['dragleave','drop'].forEach(n=>zone.addEventListener(n,e=>{e.preventDefault();zone.classList.remove('dragging')}));zone.addEventListener('drop',e=>importFiles([...e.dataTransfer.files]));
     $$('.stats-tabs button').forEach(btn=>btn.onclick=()=>{$$('.stats-tabs button').forEach(b=>b.classList.toggle('active',b===btn));state.scope=btn.dataset.scope;renderStats()});
-    $$('.mode-switch button').forEach(btn=>btn.onclick=()=>{const mode=btn.dataset.mode;if(mode==='all'){const on=!(state.visible.air&&state.visible.train);state.visible.air=on;state.visible.train=on;$$('.mode-switch button').forEach(b=>b.classList.toggle('active',on))}else{state.visible[mode]=!state.visible[mode];btn.classList.toggle('active',state.visible[mode]);const all=$('.mode-switch [data-mode=all]');all.classList.toggle('active',state.visible.air&&state.visible.train)}updateMap()});
+    $$('.mode-switch button').forEach(btn=>btn.onclick=()=>{
+      const mode=btn.dataset.mode;
+      if(mode==='straight'){
+        // 直线航线和真实航路互斥
+        state.visible.straight=true;
+        state.visible.track=false;
+        $$('.mode-switch button').forEach(b=>{
+          if(b.dataset.mode==='straight')b.classList.add('active');
+          else if(b.dataset.mode==='track')b.classList.remove('active');
+        });
+      }else if(mode==='track'){
+        // 直线航线和真实航路互斥
+        state.visible.track=true;
+        state.visible.straight=false;
+        $$('.mode-switch button').forEach(b=>{
+          if(b.dataset.mode==='track')b.classList.add('active');
+          else if(b.dataset.mode==='straight')b.classList.remove('active');
+        });
+      }else if(mode==='train'){
+        state.visible.train=!state.visible.train;
+        btn.classList.toggle('active',state.visible.train);
+      }
+      // 显示/隐藏清除航路缓存按钮
+      $('#clearTracksBtn').classList.toggle('hidden',!state.visible.track);
+      updateMap();
+      renderTable();
+    });
     $$('[data-map-style]').forEach(btn=>btn.onclick=()=>{if(btn.dataset.mapStyle===state.mapStyle)return;state.mapStyle=btn.dataset.mapStyle;$$('[data-map-style]').forEach(b=>b.classList.toggle('active',b===btn));setStatus('正在切换地图风格…');state.map.setStyle('https://demotiles.maplibre.org/globe.json')});
 
     // Quick Add Modal Logic
@@ -526,7 +815,7 @@
       toast('已添加行程');
     };
 
-    initMap();state.referencePromise=Promise.all([loadReferences(),getCurrentData().catch(()=>null)]);state.referencePromise.then(()=>{if(loadFromStorage()){state.userLoaded=true;renderAll(true);setStatus(`已恢复 ${state.rows.length} 条本地保存的行程`)}else if(!state.userLoaded)loadCurrent()});
+    initMap();state.referencePromise=Promise.all([loadReferences(),loadRailRoutes(),getCurrentData().catch(()=>null)]);state.referencePromise.then(()=>{if(loadFromStorage()){state.userLoaded=true;renderAll(true);setStatus(`已恢复 ${state.rows.length} 条本地保存的行程`)}else if(!state.userLoaded)loadCurrent()});
   })();
   </script>
 </body>
